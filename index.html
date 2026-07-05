@@ -1,0 +1,1841 @@
+<!doctype html>
+<html lang="en"><head>
+<script>window["__codeletBootstrap__"]=JSON.parse('{"A":"A","B":"20260703-05-6766c4c"}');
+</script>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>BPCDMS</title>
+ <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+ <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+ <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+ <style>
+ body { font-family: 'Work Sans', sans-serif; }
+ .tab-active { border-bottom: 3px solid #1e3a5f; color: #1e3a5f; font-weight: 600; }
+ .fade-in { animation: fadeIn 0.3s ease; }
+ @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+ .glass { background: rgba(255,255,255,0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.3); }
+ .district-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(30,58,95,0.15); }
+ .district-card { transition: all 0.2s ease; }
+ .toast { animation: slideIn 0.3s ease, fadeOut 0.3s ease 4.7s; }
+ @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+ @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+ .id-card { background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 50%, #1a365d 100%); }
+ .stat-card-btn { border: none; cursor: pointer; transition: all 0.2s ease; border-radius: 12px; padding: 0; }
+ .stat-card-btn:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(30,58,95,0.2); }
+ .pulse { animation: pulse 2s infinite; } @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.7; } }
+ .msg-bubble { border-radius: 12px; padding: 8px 12px; max-width: 80%; }
+ .msg-sent { background: #dbeafe; margin-left: auto; }
+ .msg-received { background: #f3f4f6; margin-right: auto; }
+ .msg-status { font-size: 10px; margin-top: 2px; }
+ .progress-bar-container { margin: 12px 0; }
+ .progress-line { height: 3px; background: linear-gradient(to right, #10b981 0%, #10b981 var(--progress-percent), #e5e7eb var(--progress-percent), #e5e7eb 100%); border-radius: 2px; position: relative; }
+ .progress-dots { display: flex; justify-content: space-between; margin-top: 6px; }
+ .progress-dot { width: 12px; height: 12px; border-radius: 50%; background: #e5e7eb; border: 2px solid white; box-shadow: 0 0 0 1px #e5e7eb; transition: all 0.3s ease; }
+ .progress-dot.completed { background: #10b981; box-shadow: 0 0 0 1px #10b981; }
+ .progress-dot.active { background: #1e3a5f; box-shadow: 0 0 0 2px #1e3a5f, 0 0 0 4px rgba(30, 58, 95, 0.2); }
+ .progress-labels { display: flex; justify-content: space-between; margin-top: 8px; gap: 1px; }
+ .progress-label { flex: 1; text-align: center; font-size: 11px; font-weight: 600; color: #4a5568; line-height: 1.2; padding: 0; word-break: break-word; overflow-wrap: break-word; min-height: 40px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; }
+ .label-word { display: block; word-break: break-word; }
+ .progress-percent { font-size: 11px; font-weight: 700; color: #1e3a5f; margin-top: 6px; }
+ .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 50; padding: 1rem; }
+ .modal-content { background: white; border-radius: 12px; box-shadow: 0 25px 50px rgba(0,0,0,0.25); max-width: 600px; width: 100%; max-height: 80vh; overflow-y: auto; padding: 1.5rem; }
+ </style>
+</head><body data-template-id="__page-root" class="min-h-screen w-full" style="background: rgb(240, 244, 248);">
+ <header data-template-id="header-section" class="canva-header shadow-lg" style="background: linear-gradient(135deg, rgb(30, 58, 95), rgb(44, 82, 130));">
+ <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+ <div class="flex items-center gap-3">
+ <div class="w-11 h-11 rounded-full bg-yellow-400 flex items-center justify-center shadow-md"><i data-lucide="shield" class="w-6 h-6 text-blue-900"></i>
+ </div>
+ <div>
+ <h1 data-template-id="app-title" class="canva-text font-bold" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 22px;">BPCDMS</h1>
+ <p data-template-id="app-subtitle" class="canva-text text-sm opacity-80" style="color: rgb(203, 213, 224); font-weight: 400; font-style: normal; font-size: 12px;">Bihar Police Case Disposal Management System</p>
+ </div>
+ </div>
+ <div class="text-right hidden sm:block">
+ <p data-template-id="header-label" class="canva-text text-xs opacity-70" style="color: rgb(160, 174, 192); font-weight: 400; font-style: normal; font-size: 15px;">आज की तारीख</p>
+ <p id="current-date" class="text-sm font-medium text-white"></p>
+ </div>
+ </div>
+ </header>
+ <nav class="max-w-7xl mx-auto px-4 mt-4">
+ <div class="flex gap-1 border-b border-gray-200 overflow-x-auto"><button class="tab-btn tab-active px-3 py-2 text-sm whitespace-nowrap" data-tab="state-hq"><i data-lucide="building" class="w-4 h-4 inline mr-1"></i>State HQ</button> <button class="tab-btn px-3 py-2 text-sm text-gray-500 whitespace-nowrap" data-tab="district"><i data-lucide="building-2" class="w-4 h-4 inline mr-1"></i>District</button> <button class="tab-btn px-3 py-2 text-sm text-gray-500 whitespace-nowrap" data-tab="io-dashboard"><i data-lucide="user-check" class="w-4 h-4 inline mr-1"></i>IO Portal</button> <button class="tab-btn px-3 py-2 text-sm text-gray-500 whitespace-nowrap" data-tab="cases"><i data-lucide="folder" class="w-4 h-4 inline mr-1"></i>Cases</button> <button class="tab-btn px-3 py-2 text-sm text-gray-500 whitespace-nowrap" data-tab="register"><i data-lucide="plus-circle" class="w-4 h-4 inline mr-1"></i>New FIR</button> <button class="tab-btn px-3 py-2 text-sm text-gray-500 whitespace-nowrap" data-tab="io-reg"><i data-lucide="user-plus" class="w-4 h-4 inline mr-1"></i>IO Registration</button> <button class="tab-btn px-3 py-2 text-sm text-gray-500 whitespace-nowrap" data-tab="user-portal"><i data-lucide="user" class="w-4 h-4 inline mr-1"></i>User Portal</button>
+ </div>
+ </nav>
+ <main class="max-w-7xl mx-auto px-4 py-6"><!-- State HQ -->
+ <section id="tab-state-hq">
+ <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-8 gap-3 mb-6"><button onclick="goToDistrict()" class="stat-card-btn" data-template-id="stat-districts" style="background:rgba(255,255,255,0.7);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.3);">
+ <div class="canva-card glass rounded-xl p-4 w-full h-full flex flex-col">
+ <p data-template-id="stat-districts-label" class="canva-text text-xs uppercase tracking-wide opacity-70" style="color: rgb(74, 85, 104); font-weight: 600; font-style: normal; font-size: 15px;">Districts</p>
+ <p id="hq-stat-districts" class="text-2xl font-bold mt-auto text-blue-900">38</p>
+ </div></button> <button onclick="goToDistrict()" class="stat-card-btn" data-template-id="stat-stations" style="background:rgba(255,255,255,0.7);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.3);">
+ <div class="canva-card glass rounded-xl p-4 w-full h-full flex flex-col">
+ <p data-template-id="stat-stations-label" class="canva-text text-xs uppercase tracking-wide opacity-70" style="color: rgb(74, 85, 104); font-weight: 600; font-style: normal; font-size: 15px;">Stations</p>
+ <p id="hq-stat-stations" class="text-2xl font-bold mt-auto text-indigo-700">0</p>
+ </div></button> <button onclick="showAllIOs()" class="stat-card-btn" data-template-id="stat-total-ios" style="background:rgba(255,255,255,0.7);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.3);">
+ <div class="canva-card glass rounded-xl p-4 w-full h-full flex flex-col">
+ <p data-template-id="stat-total-ios-label" class="canva-text text-xs uppercase tracking-wide opacity-70" style="color: rgb(74, 85, 104); font-weight: 600; font-style: normal; font-size: 15px;">Total IOs</p>
+ <p id="hq-stat-ios" class="text-2xl font-bold mt-auto text-blue-600">0</p>
+ </div></button> <button onclick="showActiveIOs()" class="stat-card-btn" data-template-id="stat-active-ios" style="background:rgba(255,255,255,0.7);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.3);">
+ <div class="canva-card glass rounded-xl p-4 w-full h-full flex flex-col">
+ <p data-template-id="stat-active-ios-label" class="canva-text text-xs uppercase tracking-wide opacity-70" style="color: rgb(74, 85, 104); font-weight: 600; font-style: normal; font-size: 15px;">Active IOs</p>
+ <p id="hq-stat-active" class="text-2xl font-bold mt-auto text-green-600">0</p>
+ </div></button> <button onclick="showPendingCases()" class="stat-card-btn" data-template-id="stat-pending" style="background:rgba(255,255,255,0.7);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.3);">
+ <div class="canva-card glass rounded-xl p-4 w-full h-full flex flex-col">
+ <p data-template-id="stat-pending-label" class="canva-text text-xs uppercase tracking-wide opacity-70" style="color: rgb(74, 85, 104); font-weight: 600; font-style: normal; font-size: 15px;">Pending</p>
+ <p id="hq-stat-pending" class="text-2xl font-bold mt-auto text-orange-600">0</p>
+ </div></button> <button onclick="showSolvedCases()" class="stat-card-btn" data-template-id="stat-solved" style="background:rgba(255,255,255,0.7);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.3);">
+ <div class="canva-card glass rounded-xl p-4 w-full h-full flex flex-col">
+ <p data-template-id="stat-solved-label" class="canva-text text-xs uppercase tracking-wide opacity-70" style="color: rgb(74, 85, 104); font-weight: 600; font-style: normal; font-size: 15px;">Solved</p>
+ <p id="hq-stat-solved" class="text-2xl font-bold mt-auto text-green-600">0</p>
+ </div></button> <button onclick="showAllCases()" class="stat-card-btn" data-template-id="stat-today" style="background:rgba(255,255,255,0.7);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.3);">
+ <div class="canva-card glass rounded-xl p-4 w-full h-full flex flex-col">
+ <p data-template-id="stat-today-label" class="canva-text text-xs uppercase tracking-wide opacity-70" style="color: rgb(74, 85, 104); font-weight: 600; font-style: normal; font-size: 15px;">Total Cases</p>
+ <p id="hq-stat-today" class="text-2xl font-bold mt-auto text-purple-600">0</p>
+ </div></button>
+ </div> <div data-template-id="cred-section" class="canva-panel glass rounded-xl p-5 mb-6" style="background: rgba(255, 255, 255, 0.7);">
+ <div class="flex items-center justify-between mb-4">
+ <h3 data-template-id="cred-title" class="canva-text font-semibold" style="color: rgb(26, 32, 44); font-weight: 700; font-style: normal; font-size: 16px;">🔑 District Credential Management — State HQ</h3><button id="toggle-creds" class="text-xs bg-blue-900 text-white px-3 py-1.5 rounded-lg hover:bg-blue-800 font-medium">Show All Credentials</button>
+ </div>
+ <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+ <div>
+ <label class="text-xs font-medium text-gray-600 block mb-1" for="cred-district-sel">Select District</label><select id="cred-district-sel" class="w-full border rounded-lg px-3 py-2 text-sm"><option value="">Choose district...</option></select>
+ </div>
+ <div class="flex items-end">
+ <button id="gen-cred-btn" class="bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-800 w-full"><i data-lucide="key" class="w-4 h-4 inline mr-1"></i>Generate / View Credential</button>
+ </div>
+ <div id="cred-output" class="bg-blue-50 border border-blue-200 rounded-lg p-3 hidden">
+ <p class="text-xs text-gray-500">Master ID</p>
+ <p id="cred-id-out" class="font-mono font-bold text-blue-900"></p>
+ <p class="text-xs text-gray-500 mt-1">Password</p>
+ <p id="cred-pw-out" class="font-mono font-bold text-green-700"></p>
+ </div>
+ </div>
+ <div id="cred-table-wrap" class="hidden overflow-x-auto">
+ <table class="w-full text-sm">
+ <thead class="bg-blue-900/10">
+ <tr>
+ <th class="p-2 text-left text-xs uppercase text-gray-600">District</th> <th class="p-2 text-left text-xs uppercase text-gray-600">Master ID</th>
+ <th class="p-2 text-left text-xs uppercase text-gray-600">Password</th>
+ <th class="p-2 text-center text-xs uppercase text-gray-600">Status</th>
+ </tr>
+ </thead>
+ <tbody id="cred-tbody"></tbody>
+ </table>
+ </div>
+ </div>
+ <div data-template-id="hq-msg-section" class="canva-panel glass rounded-xl p-5 mb-6" style="background: rgba(255, 255, 255, 0.7);">
+ <h3 data-template-id="hq-msg-title" class="canva-text font-semibold mb-3" style="color: rgb(26, 32, 44); font-weight: 700; font-style: normal; font-size: 16px;">📨 State HQ Messaging — Send Directives to Districts &amp; IOs</h3>
+ <div id="hq-msg-list" class="space-y-2 max-h-48 overflow-y-auto mb-4 border rounded-lg p-3 bg-white/50"></div>
+ <div class="grid grid-cols-1 sm:grid-cols-3 gap-3"><select id="hq-msg-to" class="border rounded-lg px-3 py-2 text-sm"><option value="">Send to...</option></select> <input id="hq-msg-text" type="text" placeholder="Type message or directive..." class="border rounded-lg px-3 py-2 text-sm"> <button id="hq-msg-send" class="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800"><i data-lucide="send" class="w-4 h-4 inline mr-1"></i>Send</button>
+ </div>
+ </div>
+ <div data-template-id="ai-section" class="canva-panel glass rounded-xl p-5 mb-6" style="background: rgba(255, 255, 255, 0.7);">
+ <h3 data-template-id="ai-title" class="canva-text font-semibold mb-3" style="color: rgb(26, 32, 44); font-weight: 700; font-style: normal; font-size: 16px;">🤖 AI Insights &amp; Recommendations</h3>
+ <div id="ai-insights" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+ </div>
+ <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+ <div data-template-id="chart-disposal" class="canva-panel glass rounded-xl p-5" style="background: rgba(255, 255, 255, 0.7);"> <h4 data-template-id="chart-disposal-title" class="canva-text font-semibold mb-3" style="color: rgb(26, 32, 44); font-weight: 600; font-style: normal; font-size: 15px;">Monthly Case Disposal</h4>
+ <canvas id="chart-disposal-canvas" class="w-full" height="180"></canvas>
+ </div>
+ <div data-template-id="chart-category" class="canva-panel glass rounded-xl p-5" style="background: rgba(255, 255, 255, 0.7);">
+ <h4 data-template-id="chart-category-title" class="canva-text font-semibold mb-3" style="color: rgb(26, 32, 44); font-weight: 600; font-style: normal; font-size: 15px;">Crime Category Distribution</h4>
+ <canvas id="chart-category-canvas" class="w-full" height="180"></canvas>
+ </div>
+ </div>
+ <div data-template-id="hq-table-section" class="canva-panel glass rounded-xl p-5" style="background: rgba(255, 255, 255, 0.7);">
+ <h3 data-template-id="hq-table-title" class="canva-text font-semibold mb-3" style="color: rgb(26, 32, 44); font-weight: 700; font-style: normal; font-size: 16px;">District Performance Ranking</h3>
+ <div class="overflow-x-auto">
+ <table class="w-full text-sm">
+ <thead class="bg-blue-900/10">
+ <tr>
+ <th class="p-2 text-left text-xs font-semibold text-gray-600">Rank</th>
+ <th class="p-2 text-left text-xs font-semibold text-gray-600">District</th>
+ <th class="p-2 text-center text-xs font-semibold text-gray-600">IOs</th>
+ <th class="p-2 text-center text-xs font-semibold text-gray-600">Cases</th>
+ <th class="p-2 text-center text-xs font-semibold text-gray-600">Pending</th>
+ <th class="p-2 text-center text-xs font-semibold text-gray-600">Solved</th>
+ <th class="p-2 text-center text-xs font-semibold text-gray-600">Rate</th>
+ </tr>
+ </thead>
+ <tbody id="hq-district-tbody"></tbody> </table>
+ </div>
+ </div>
+ </section><!-- District Portal -->
+ <section id="tab-district" class="hidden">
+ <div id="district-select-view">
+ <h3 data-template-id="district-select-title" class="canva-text font-semibold mb-4" style="color: rgb(26, 32, 44); font-weight: 700; font-style: normal; font-size: 18px;">Select District — Bihar (38 Districts)</h3>
+ <div id="district-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+</div>
+ </div>
+ <div id="district-login-view" class="hidden fade-in">
+ <div class="max-w-md mx-auto"><button id="back-to-grid" class="flex items-center gap-1 text-sm text-blue-700 mb-4 hover:underline"><i data-lucide="arrow-left" class="w-4 h-4"></i> Back</button>
+ <div data-template-id="dist-login-card" class="canva-card glass rounded-xl p-6 shadow-lg" style="background: rgba(255, 255, 255, 0.85);">
+ <div class="flex items-center gap-3 mb-4">
+ <div class="w-10 h-10 rounded-full bg-yellow-400 flex items-center justify-center">
+ <i data-lucide="shield" class="w-5 h-5 text-blue-900"></i>
+ </div>
+ <div>
+ <h3 id="dist-login-name" class="font-bold text-blue-900"></h3>
+ <p class="text-xs text-gray-500">Secure Authentication Required</p>
+ </div>
+ </div>
+ <form id="dist-login-form" class="space-y-3">
+ <div>
+ <label class="text-sm font-medium text-gray-700 block mb-1" for="dist-login-id">District ID</label><input id="dist-login-id" type="text" required="" class="w-full border rounded-lg px-3 py-2 text-sm" placeholder="Enter District ID">
+ </div>
+ <div>
+ <label class="text-sm font-medium text-gray-700 block mb-1" for="dist-login-pw">Master Password</label><input id="dist-login-pw" type="text" required="" class="w-full border rounded-lg px-3 py-2 text-sm" placeholder="Enter Password">
+ </div><button type="submit" class="w-full bg-blue-900 text-white py-2 rounded-lg font-medium hover:bg-blue-800">Authenticate</button>
+ <p id="dist-login-error" class="text-red-600 text-xs hidden"></p>
+ </form>
+ </div>
+ </div>
+ </div>
+ <div id="district-dashboard-view" class="hidden fade-in">
+ <div class="flex items-center justify-between mb-4">
+ <div class="flex items-center gap-2"><button id="dist-dash-back" class="text-sm bg-blue-100 text-blue-800 px-3 py-1.5 rounded-lg hover:bg-blue-200"><i data-lucide="arrow-left" class="w-4 h-4 inline"></i></button>
+ <h3 id="dist-dash-name" class="text-lg font-bold text-blue-900"></h3><span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded font-medium pulse">🟢 Online</span>
+ </div>
+ </div>
+ <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6"><button onclick="filterDDCases('pending')" class="glass rounded-xl p-5 border-l-4 border-l-orange-500 cursor-pointer hover:shadow-md transition-all text-left"> <p class="text-xs text-gray-500 uppercase font-semibold">Pending</p><p id="dd-pending" class="text-3xl font-bold text-orange-600 mt-2">0</p>
+</button> <button onclick="filterDDCases('solved')" class="glass rounded-xl p-5 border-l-4 border-l-green-500 cursor-pointer hover:shadow-md transition-all text-left"> <p class="text-xs text-gray-500 uppercase font-semibold">Solved</p><p id="dd-solved" class="text-3xl font-bold text-green-600 mt-2">0</p></button> <button onclick="filterDDCases('active')" class="glass rounded-xl p-5 border-l-4 border-l-blue-500 cursor-pointer hover:shadow-md transition-all text-left"> <p class="text-xs text-gray-500 uppercase font-semibold">Active IOs</p><p id="dd-ios" class="text-3xl font-bold text-blue-600 mt-2">0</p></button> <button onclick="filterDDCases('high')" class="glass rounded-xl p-5 border-l-4 border-l-red-500 cursor-pointer hover:shadow-md transition-all text-left"> <p class="text-xs text-gray-500 uppercase font-semibold">High Priority</p><p id="dd-high" class="text-3xl font-bold text-red-600 mt-2">0</p></button>
+ </div>
+ <div class="glass rounded-xl p-5 mb-4">
+ <h4 data-template-id="dd-io-title" class="canva-text font-semibold mb-3" style="color: rgb(26, 32, 44); font-weight: 700; font-style: normal; font-size: 15px;">Investigating Officers</h4>
+ <div id="dd-io-list" class="space-y-2 max-h-72 overflow-y-auto"></div>
+ </div>
+ <div class="glass rounded-xl p-5 mb-4">
+ <h4 data-template-id="dd-cases-title" class="canva-text font-semibold mb-3" style="color: rgb(26, 32, 44); font-weight: 700; font-style: normal; font-size: 15px;">District Cases (Click for Detail)</h4>
+ <div id="dd-cases-list" class="space-y-2 max-h-64 overflow-y-auto"></div>
+ </div>
+ <div class="glass rounded-xl p-5 mb-4">
+ <h4 data-template-id="dd-duty-title" class="canva-text font-semibold mb-4" style="color: rgb(26, 32, 44); font-weight: 700; font-style: normal; font-size: 15px;">Assign Duty to IO</h4>
+ <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+ <div>
+ <label class="text-sm font-medium text-gray-700 block mb-1" for="dd-duty-io">Select IO</label>
+<select id="dd-duty-io" class="w-full border rounded-lg px-3 py-2 text-sm"><option value="">Choose IO...</option></select>
+ </div>
+ <div>
+ <label class="text-sm font-medium text-gray-700 block mb-1" for="dd-duty-type">Duty Type</label><select id="dd-duty-type" class="w-full border rounded-lg px-3 py-2 text-sm"><option value="Investigation">Investigation Duty</option><option value="Court">Court Duty</option><option value="VIP">VIP Duty</option><option value="Election">Election Duty</option><option value="Festival">Festival Duty</option><option value="Law &amp; Order">Law &amp; Order</option><option value="Emergency">Emergency Duty</option></select>
+ </div>
+ </div>
+ <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3"> <div>
+ <label class="text-sm font-medium text-gray-700 block mb-1" for="dd-duty-location">Location</label><input id="dd-duty-location" type="text" class="w-full border rounded-lg px-3 py-2 text-sm" placeholder="Duty location">
+ </div>
+ <div>
+ <label class="text-sm font-medium text-gray-700 block mb-1" for="dd-duty-time">Date &amp; Time</label><input id="dd-duty-time" type="datetime-local" class="w-full border rounded-lg px-3 py-2 text-sm">
+ </div>
+ </div>
+ <div class="mb-3">
+ <label class="text-sm font-medium text-gray-700 block mb-1" for="dd-duty-desc">Instructions</label><textarea id="dd-duty-desc" rows="2" class="w-full border rounded-lg px-3 py-2 text-sm" placeholder="Duty instructions..."></textarea>
+ </div><button id="dd-assign-btn" class="bg-purple-700 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-purple-800">Assign Duty</button> <span id="dd-duty-status" class="ml-3 text-sm hidden"></span>
+ </div>
+ <div class="glass rounded-xl p-5 mb-4">
+ <h4 class="font-semibold text-sm text-gray-800 mb-3">🏖 Leave Applications from IOs</h4>
+ <div id="dd-leave-applications" class="space-y-3 max-h-96 overflow-y-auto"></div>
+ </div>
+ <div data-template-id="dist-msg-section" class="canva-panel glass rounded-xl p-5" style="background: rgba(255, 255, 255, 0.7);">
+ <h4 data-template-id="dist-msg-title" class="canva-text font-semibold mb-3" style="color: rgb(26, 32, 44); font-weight: 700; font-style: normal; font-size: 15px;">📨 District Messaging — Send to HQ, Other Districts &amp; IOs</h4>
+ <div id="dist-msg-list" class="space-y-2 max-h-48 overflow-y-auto mb-4 border rounded-lg p-3 bg-white/50"></div>
+ <div class="grid grid-cols-1 sm:grid-cols-3 gap-3"><select id="dist-msg-to" class="border rounded-lg px-3 py-2 text-sm"><option value="">Send to...</option></select> <input id="dist-msg-text" type="text" placeholder="Type message..." class="border rounded-lg px-3 py-2 text-sm"><button id="dist-msg-send" class="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800"><i data-lucide="send" class="w-4 h-4 inline mr-1"></i>Send</button>
+ </div>
+ </div>
+ </div>
+ </section><!-- IO Portal -->
+ <section id="tab-io-dashboard" class="hidden">
+ <div data-template-id="io-portal-card" class="canva-card glass rounded-xl shadow p-6 max-w-3xl" style="background: rgba(255, 255, 255, 0.8);">
+ <h3 data-template-id="io-dash-title" class="canva-text font-semibold mb-4" style="color: rgb(26, 32, 44); font-weight: 700; font-style: normal; font-size: 18px;">IO Portal — Login with Your Unique ID</h3>
+ <p data-template-id="io-login-desc" class="canva-text text-sm mb-4" style="color: rgb(74, 85, 104); font-weight: 400; font-style: normal; font-size: 15px;">Enter your unique IO ID (e.g. BP00000001) to access your dashboard.</p>
+ <div class="flex gap-2 mb-4"><input id="io-login-id" type="text" placeholder="e.g. BP00000001" class="border rounded-lg px-3 py-2 text-sm flex-1 max-w-xs uppercase"> <button id="io-login-btn" class="bg-blue-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-900">Login</button>
+ </div>
+ <p id="io-login-error" class="text-red-600 text-sm hidden mb-3"></p>
+ <div id="io-logged-view" class="hidden fade-in">
+ <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+ <div class="flex items-center justify-between">
+ <div>
+ <p id="io-info-name" class="font-semibold text-blue-900"></p>
+ <p id="io-info-meta" class="text-xs text-blue-700"></p>
+ </div>
+ <div class="flex gap-2"><button id="io-callback-btn" class="text-xs bg-red-600 text-white px-3 py-1.5 rounded hover:bg-red-700 font-medium">📞 Call Back</button> <button id="io-logout-btn" class="text-xs bg-gray-200 text-gray-700 px-3 py-1 rounded hover:bg-gray-300">Logout</button>
+ </div> </div>
+ </div>
+ <div id="io-callback-status" class="hidden mb-3 bg-green-50 border border-green-200 rounded-lg p-3 text-sm text-green-700"></div>
+ <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-4">
+ <div class="glass rounded-lg p-3 text-center">
+ <p class="text-xs text-gray-500">Total Cases</p>
+ <p id="io-stat-total" class="text-xl font-bold text-blue-600">0</p>
+ </div>
+ <div class="glass rounded-lg p-3 text-center">
+ <p class="text-xs text-gray-500">Pending</p>
+ <p id="io-stat-pending" class="text-xl font-bold text-orange-600">0</p>
+ </div>
+ <div class="glass rounded-lg p-3 text-center">
+ <p class="text-xs text-gray-500">Disposed</p>
+ <p id="io-stat-disposed" class="text-xl font-bold text-green-600">0</p>
+ </div>
+ <div class="glass rounded-lg p-3 text-center">
+ <p class="text-xs text-gray-500">Duties</p>
+ <p id="io-stat-duties" class="text-xl font-bold text-purple-600">0</p>
+ </div>
+ </div>
+ <h4 class="font-semibold text-sm text-yellow-700 mb-2">🔔 Notifications</h4>
+ <div id="io-notif-list" class="space-y-2 mb-4"></div>
+ <h4 class="font-semibold text-sm text-purple-800 mb-2">📋 Assigned Duties</h4>
+ <div id="io-duty-list" class="space-y-2 mb-4"></div>
+ <h4 class="font-semibold text-sm text-gray-800 mb-2">📂 My Cases</h4>
+ <div id="io-cases-list" class="space-y-2 mb-4"></div> <div class="glass rounded-xl p-5 mb-4">
+ <h4 class="font-semibold text-sm text-gray-800 mb-3">🏖 Leave Application</h4>
+ <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+ <div>
+ <label class="text-sm font-medium text-gray-700 block mb-1" for="io-leave-from">From Date</label><input id="io-leave-from" type="date" class="w-full border rounded-lg px-3 py-2 text-sm">
+ </div>
+ <div>
+ <label class="text-sm font-medium text-gray-700 block mb-1" for="io-leave-to">To Date</label>
+<input id="io-leave-to" type="date" class="w-full border rounded-lg px-3 py-2 text-sm">
+ </div>
+ </div>
+ <div class="mb-3">
+ <label class="text-sm font-medium text-gray-700 block mb-1" for="io-leave-reason">Reason for Leave</label><textarea id="io-leave-reason" rows="2" class="w-full border rounded-lg px-3 py-2 text-sm" placeholder="Enter reason..."></textarea>
+ </div><button id="io-leave-submit" class="bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-blue-800">Submit Leave Application</button> <span id="io-leave-status" class="ml-3 text-sm hidden"></span>
+ </div>
+ <div class="glass rounded-xl p-5 mb-4">
+ <h4 class="font-semibold text-sm text-gray-800 mb-3">📋 My Leave Applications</h4>
+ <div id="io-leave-history" class="space-y-2 max-h-48 overflow-y-auto"></div>
+ </div>
+ <div data-template-id="io-msg-section" class="canva-panel glass rounded-xl p-5 mt-4" style="background: rgba(255, 255, 255, 0.7);">
+ <h4 data-template-id="io-msg-title" class="canva-text font-semibold mb-3" style="color: rgb(26, 32, 44); font-weight: 700; font-style: normal; font-size: 15px;">📨 IO Messaging — Connect with District &amp; Users</h4>
+ <div id="io-msg-list" class="space-y-2 max-h-48 overflow-y-auto mb-4 border rounded-lg p-3 bg-white/50"></div> <div class="grid grid-cols-1 sm:grid-cols-4 gap-3"><select id="io-msg-case" class="border rounded-lg px-3 py-2 text-sm"><option value="">Select Case/FIR...</option></select> <select id="io-msg-to" class="border rounded-lg px-3 py-2 text-sm"><option value="">Send to...</option><option value="district">District Authority</option><option value="user">User/Complainant</option></select>
+<input id="io-msg-text" type="text" placeholder="Type message..." class="border rounded-lg px-3 py-2 text-sm"> <button id="io-msg-send" class="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800"><i data-lucide="send" class="w-4 h-4 inline mr-1"></i>Send</button>
+ </div>
+ </div>
+ </div>
+ </div>
+ </section><!-- Cases -->
+ <section id="tab-cases" class="hidden">
+ <div class="flex flex-wrap gap-2 mb-4"><input id="search-input" type="text" placeholder="Search FIR / IO / Thana..." class="border rounded-lg px-3 py-2 text-sm flex-1 min-w-[200px]"> <select id="filter-category" class="border rounded-lg px-3 py-2 text-sm"><option value="">All Categories</option><option value="Murder">Murder</option><option value="Theft">Theft</option>
+<option value="Cyber Crime">Cyber Crime</option><option value="Women Safety">Women Safety</option><option value="Kidnapping">Kidnapping</option><option value="Missing Person">Missing Person</option><option value="Narcotics">Narcotics</option><option value="Financial Crime">Financial Crime</option><option value="Traffic">Traffic</option><option value="Other">Other</option></select> <select id="filter-status" class="border rounded-lg px-3 py-2 text-sm"><option value="">All Status</option><option value="Pending">Pending</option><option value="Under Investigation">Under Investigation</option><option value="Evidence Collection">Evidence Collection</option><option value="Charge Sheet Ready">Charge Sheet Ready</option><option value="Court Trial">Court Trial</option><option value="Closed">Closed</option><option value="Disposed">Disposed</option></select>
+ </div>
+ <div id="cases-summary" class="mb-3 flex gap-4 text-sm font-medium text-gray-600"></div>
+ <div id="cases-list" class="space-y-3"></div>
+ <p id="no-cases" class="text-center text-gray-400 py-8 hidden">No cases found.</p>
+ </section><!-- New FIR -->
+ <section id="tab-register" class="hidden">
+ <div data-template-id="form-card" class="canva-card rounded-xl shadow p-6 max-w-2xl bg-white mx-auto" style="background: rgb(255, 255, 255);"> <h3 data-template-id="form-title" class="canva-text font-semibold mb-4" style="color: rgb(26, 32, 44); font-weight: 700; font-style: normal; font-size: 18px;">New Case Registration (FIR)</h3>
+ <form id="case-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+ <div>
+ <label data-template-id="label-fir" class="canva-text text-sm font-medium" for="fir" style="color: rgb(45, 55, 72); font-weight: 400; font-style: normal; font-size: 15px;">FIR Number</label><input id="fir" type="text" required="" class="w-full border rounded-lg px-3 py-2 mt-1 text-sm">
+ </div>
+ <div>
+ <label data-template-id="label-category" class="canva-text text-sm font-medium" for="case-category" style="color: rgb(45, 55, 72); font-weight: 400; font-style: normal; font-size: 15px;">Crime Category</label><select id="case-category" required="" class="w-full border rounded-lg px-3 py-2 mt-1 text-sm"><option value="">Select Category</option><option value="Murder">Murder</option>
+<option value="Theft">Theft</option><option value="Cyber Crime">Cyber Crime</option><option value="Women Safety">Women Safety</option><option value="Kidnapping">Kidnapping</option>
+<option value="Missing Person">Missing Person</option><option value="Narcotics">Narcotics</option><option value="Financial Crime">Financial Crime</option>
+<option value="Traffic">Traffic</option><option value="Other">Other</option></select>
+ </div>
+ <div>
+ <label data-template-id="label-new-fir-gender" class="canva-text text-sm font-medium" for="case-gender" style="color: rgb(45, 55, 72); font-weight: 400; font-style: normal; font-size: 15px;">Complainant Gender</label><select id="case-gender" required="" class="w-full border rounded-lg px-3 py-2 mt-1 text-sm"><option value="">Select Gender</option><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select>
+ </div>
+ <div>
+ <label data-template-id="label-district" class="canva-text text-sm font-medium" for="district-sel" style="color: rgb(45, 55, 72); font-weight: 400; font-style: normal; font-size: 15px;">District (जिला)</label><select id="district-sel" required="" class="w-full border rounded-lg px-3 py-2 mt-1 text-sm">
+<option value="">Select District</option></select>
+ </div>
+ <div>
+ <label data-template-id="label-thana" class="canva-text text-sm font-medium" for="thana" style="color: rgb(45, 55, 72); font-weight: 400; font-style: normal; font-size: 15px;">Thana (थाना)</label><select id="thana" required="" class="w-full border rounded-lg px-3 py-2 mt-1 text-sm">
+<option value="">Select Thana</option></select>
+ </div>
+ <div>
+ <label data-template-id="label-sections" class="canva-text text-sm font-medium" for="sections" style="color: rgb(45, 55, 72); font-weight: 400; font-style: normal; font-size: 15px;">Sections (धारा)</label><input id="sections" type="text" required="" class="w-full border rounded-lg px-3 py-2 mt-1 text-sm">
+ </div>
+ <div>
+ <label data-template-id="label-incident-date" class="canva-text text-sm font-medium" for="incident-date" style="color: rgb(45, 55, 72); font-weight: 400; font-style: normal; font-size: 15px;">Incident Date</label><input id="incident-date" type="date" required="" class="w-full border rounded-lg px-3 py-2 mt-1 text-sm">
+ </div>
+ <div>
+ <label data-template-id="label-stage" class="canva-text text-sm font-medium" for="stage" style="color: rgb(45, 55, 72); font-weight: 400; font-style: normal; font-size: 15px;">Current Stage</label><select id="stage" required="" class="w-full border rounded-lg px-3 py-2 mt-1 text-sm">
+<option value="Pending">Pending</option><option value="Under Investigation">Under Investigation</option><option value="Evidence Collection">Evidence Collection</option><option value="Charge Sheet Ready">Charge Sheet Ready</option><option value="Court Trial">Court Trial</option></select>
+ </div>
+ <div>
+ <label data-template-id="label-deadline" class="canva-text text-sm font-medium" for="deadline" style="color: rgb(45, 55, 72); font-weight: 400; font-style: normal; font-size: 15px;">Deadline</label>
+<input id="deadline" type="date" class="w-full border rounded-lg px-3 py-2 mt-1 text-sm">
+ </div>
+ <div>
+ <label data-template-id="label-mobile" class="canva-text text-sm font-medium" for="user-mobile" style="color: rgb(45, 55, 72); font-weight: 400; font-style: normal; font-size: 15px;">Complainant Mobile</label><input id="user-mobile" type="tel" class="w-full border rounded-lg px-3 py-2 mt-1 text-sm" placeholder="Complainant mobile">
+ </div> <div class="sm:col-span-2">
+ <label data-template-id="label-residential-address" class="canva-text text-sm font-medium" for="case-residential-address" style="color: rgb(45, 55, 72); font-weight: 400; font-style: normal; font-size: 15px;">Complainant Residential Address</label><textarea id="case-residential-address" rows="2" class="w-full border rounded-lg px-3 py-2 mt-1 text-sm" placeholder="Complainant's residential address..."></textarea>
+ </div>
+ <div class="sm:col-span-2">
+ <label data-template-id="label-description" class="canva-text text-sm font-medium" for="case-description" style="color: rgb(45, 55, 72); font-weight: 400; font-style: normal; font-size: 15px;">Incident Description (विवरण)</label><textarea id="case-description" rows="3" class="w-full border rounded-lg px-3 py-2 mt-1 text-sm" placeholder="Describe the incident in detail..."></textarea>
+ </div>
+ <div class="sm:col-span-2">
+ <label data-template-id="label-address" class="canva-text text-sm font-medium" for="case-address" style="color: rgb(45, 55, 72); font-weight: 400; font-style: normal; font-size: 15px;">Incident Location &amp; Address</label><textarea id="case-address" rows="2" class="w-full border rounded-lg px-3 py-2 mt-1 text-sm" placeholder="Incident location / address..."></textarea>
+ </div>
+ <div class="sm:col-span-2">
+ <label data-template-id="label-app-image" class="canva-text text-sm font-medium block mb-1" for="app-image" style="color: rgb(45, 55, 72); font-weight: 600; font-style: normal; font-size: 15px;">Application Image (आवेदन का चित्र)</label>
+ <div class="border-2 border-dashed rounded-lg p-4 text-center cursor-pointer hover:bg-blue-50 transition-colors" onclick="document.getElementById('app-image').click()" id="image-drop-zone">
+ <i data-lucide="upload" class="w-6 h-6 text-blue-600 mx-auto mb-2"></i>
+ <p class="text-sm text-gray-600 font-medium">Click to upload or drag image here</p>
+ <p class="text-xs text-gray-400 mt-1">Supported: PNG, JPG (Max 5MB)</p><input id="app-image" type="file" accept="image/*" class="hidden">
+ <div id="image-preview" class="hidden mt-3">
+ <img id="preview-img" class="max-h-32 mx-auto rounded-lg border">
+ <p id="preview-name" class="text-xs text-gray-500 mt-2"></p>
+ </div> </div>
+ <p id="image-error" class="text-red-600 text-xs mt-1 hidden"></p>
+ </div>
+ <div class="sm:col-span-2"><button data-template-id="submit-btn" type="submit" class="canva-button px-6 py-2 rounded-lg font-medium" style="background: rgb(30, 58, 95); color: rgb(255, 255, 255); font-weight: 600; font-style: normal; font-size: 15px;">Register Case</button> <span id="form-status" class="ml-3 text-sm hidden"></span>
+ </div>
+ </form>
+ </div>
+ </section><!-- IO Registration -->
+ <section id="tab-io-reg" class="hidden">
+ <div data-template-id="io-reg-card" class="canva-card glass rounded-xl shadow p-6 max-w-3xl" style="background: rgba(255, 255, 255, 0.8);">
+ <h3 data-template-id="io-reg-title" class="canva-text font-semibold mb-2" style="color: rgb(26, 32, 44); font-weight: 700; font-style: normal; font-size: 18px;">IO Registration — District Authority</h3>
+ <p data-template-id="io-reg-desc" class="canva-text text-sm mb-4" style="color: rgb(74, 85, 104); font-weight: 400; font-style: normal; font-size: 15px;">Register Investigating Officers. Each IO receives a unique ID.</p>
+ <form id="io-reg-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+ <div>
+ <label data-template-id="label-io-name" class="canva-text text-sm font-medium" for="io-name" style="color: rgb(45, 55, 72); font-weight: 400; font-style: normal; font-size: 15px;">Full Name</label>
+<input id="io-name" type="text" required="" class="w-full border rounded-lg px-3 py-2 mt-1 text-sm">
+ </div>
+ <div>
+ <label data-template-id="label-io-rank" class="canva-text text-sm font-medium" for="io-rank" style="color: rgb(45, 55, 72); font-weight: 400; font-style: normal; font-size: 15px;">Rank / Designation</label><select id="io-rank" required="" class="w-full border rounded-lg px-3 py-2 mt-1 text-sm"><option value="">Select Rank</option><option value="SI">Sub Inspector (SI)</option>
+<option value="ASI">Asst. Sub Inspector (ASI)</option><option value="Inspector">Inspector</option><option value="DSP">DSP</option></select>
+ </div> <div>
+ <label data-template-id="label-io-belt" class="canva-text text-sm font-medium" for="io-belt" style="color: rgb(45, 55, 72); font-weight: 400; font-style: normal; font-size: 15px;">Belt Number</label><input id="io-belt" type="text" required="" class="w-full border rounded-lg px-3 py-2 mt-1 text-sm">
+ </div>
+ <div>
+ <label data-template-id="label-io-mobile" class="canva-text text-sm font-medium" for="io-mobile" style="color: rgb(45, 55, 72); font-weight: 400; font-style: normal; font-size: 15px;">Mobile Number</label><input id="io-mobile" type="tel" required="" class="w-full border rounded-lg px-3 py-2 mt-1 text-sm">
+ </div>
+ <div>
+ <label data-template-id="label-io-email" class="canva-text text-sm font-medium" for="io-email" style="color: rgb(45, 55, 72); font-weight: 400; font-style: normal; font-size: 15px;">Email Address</label><input id="io-email" type="email" class="w-full border rounded-lg px-3 py-2 mt-1 text-sm">
+ </div>
+ <div>
+ <label data-template-id="label-io-district" class="canva-text text-sm font-medium" for="io-district" style="color: rgb(45, 55, 72); font-weight: 400; font-style: normal; font-size: 15px;">District</label>
+<select id="io-district" required="" class="w-full border rounded-lg px-3 py-2 mt-1 text-sm"><option value="">Select District</option></select>
+ </div>
+ <div>
+ <label data-template-id="label-io-station" class="canva-text text-sm font-medium" for="io-station" style="color: rgb(45, 55, 72); font-weight: 400; font-style: normal; font-size: 15px;">Police Station</label><select id="io-station" required="" class="w-full border rounded-lg px-3 py-2 mt-1 text-sm"><option value="">Select Station</option></select>
+ </div>
+ <div>
+ <label data-template-id="label-io-joining" class="canva-text text-sm font-medium" for="io-joining" style="color: rgb(45, 55, 72); font-weight: 400; font-style: normal; font-size: 15px;">Date of Joining</label><input id="io-joining" type="date" required="" class="w-full border rounded-lg px-3 py-2 mt-1 text-sm"> </div>
+ <div class="sm:col-span-2"><button data-template-id="io-reg-btn" type="submit" class="canva-button px-6 py-2 rounded-lg font-medium" style="background: rgb(44, 82, 130); color: rgb(255, 255, 255); font-weight: 600; font-style: normal; font-size: 15px;">Register IO &amp; Issue ID</button>
+<span id="io-reg-status" class="ml-3 text-sm hidden"></span>
+ </div>
+ </form>
+ <div id="io-id-card" class="hidden mt-6 fade-in">
+ <h4 class="font-semibold text-sm mb-3 text-gray-700">📇 IO Identity Card Issued</h4>
+ <div class="id-card rounded-xl p-5 max-w-md text-white shadow-lg relative overflow-hidden">
+ <div class="absolute top-0 right-0 w-24 h-24 bg-yellow-400 opacity-10 rounded-full -translate-y-8 translate-x-8"></div>
+ <div class="flex items-center gap-2 mb-3 border-b border-white/20 pb-2">
+ <div class="w-8 h-8 rounded-full bg-yellow-400 flex items-center justify-center">
+ <i data-lucide="shield" class="w-5 h-5 text-blue-900"></i>
+ </div>
+ <div>
+ <p class="text-xs font-bold uppercase tracking-wider">Bihar Police</p>
+ <p class="text-[10px] opacity-70">Investigating Officer ID Card</p>
+ </div>
+ </div>
+ <div class="grid grid-cols-2 gap-2 text-xs">
+ <div>
+ <p class="opacity-60">Unique ID</p>
+ <p id="card-io-id" class="font-bold text-yellow-300 text-base"></p>
+ </div>
+ <div>
+ <p class="opacity-60">Name</p>
+ <p id="card-io-name" class="font-semibold"></p> </div>
+ <div>
+ <p class="opacity-60">Rank</p>
+ <p id="card-io-rank" class="font-medium"></p>
+ </div>
+ <div>
+ <p class="opacity-60">Mobile</p>
+ <p id="card-io-mobile" class="font-medium"></p>
+ </div>
+ <div>
+ <p class="opacity-60">District</p>
+ <p id="card-io-district" class="font-semibold text-yellow-200"></p>
+ </div>
+ <div>
+ <p class="opacity-60">Station</p>
+ <p id="card-io-station" class="font-medium"></p>
+ </div>
+ </div>
+ </div>
+ </div>
+ <div class="mt-6">
+ <h4 class="font-semibold text-sm mb-3 text-gray-700">Registered IOs</h4>
+ <div id="io-list" class="space-y-2 max-h-96 overflow-y-auto"></div>
+ </div>
+ </div>
+ </section><!-- User Portal -->
+ <section id="tab-user-portal" class="hidden"> <div class="flex gap-2 mb-4 border-b border-gray-200">
+ <button id="user-portal-track-btn" class="px-4 py-2 text-sm font-medium text-blue-700 border-b-2 border-blue-700">📍 Track Case</button> <button id="user-portal-online-fir-btn" class="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">📝 File Online FIR</button>
+ </div><!-- Track Case View -->
+ <div id="user-track-view" class="fade-in">
+ <div data-template-id="user-portal-card" class="canva-card glass rounded-xl shadow p-6 max-w-2xl" style="background: rgba(255, 255, 255, 0.8);">
+ <h3 data-template-id="user-portal-title" class="canva-text font-semibold mb-4" style="color: rgb(26, 32, 44); font-weight: 700; font-style: normal; font-size: 18px;">User Portal — Track Your Case</h3>
+ <div class="flex gap-2 mb-2"><input id="user-search-mobile" type="tel" placeholder="Enter your 10-digit mobile number..." class="border rounded-lg px-3 py-2 text-sm flex-1"> <button id="user-search-btn" class="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800">Track by Mobile</button>
+ </div>
+ <div class="flex gap-2 mb-4"><input id="user-search-case" type="text" placeholder="Or enter FIR case number..." class="border rounded-lg px-3 py-2 text-sm flex-1"> <button id="user-search-case-btn" class="bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-800">Track by Case</button>
+ </div>
+ <p id="user-mobile-error" class="text-red-600 text-sm hidden mb-3"></p>
+ <div id="user-cases-result" class="space-y-4"></div>
+ <p id="user-no-result" class="text-center text-gray-400 py-4 hidden">No cases found for this mobile number.</p>
+ <div id="user-msg-wrapper" class="hidden">
+ <div data-template-id="user-msg-section" class="canva-panel glass rounded-xl p-5 mt-6" style="background: rgba(255, 255, 255, 0.7);">
+ <h4 data-template-id="user-msg-title" class="canva-text font-semibold mb-3" style="color: rgb(26, 32, 44); font-weight: 700; font-style: normal; font-size: 15px;">📨 Message IO — Report Incident or Share Info</h4>
+ <div id="user-msg-list" class="space-y-2 max-h-48 overflow-y-auto mb-4 border rounded-lg p-3 bg-white/50"></div> <div class="grid grid-cols-1 gap-3"><input id="user-msg-text" type="text" placeholder="Report incident or send message to IO..." class="border rounded-lg px-3 py-2 text-sm"> <button id="user-msg-send" class="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800"><i data-lucide="send" class="w-4 h-4 inline mr-1"></i>Send to IO</button>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div><!-- Online FIR View -->
+ <div id="user-online-fir-view" class="hidden fade-in">
+ <div data-template-id="online-fir-card" class="canva-card glass rounded-xl shadow p-6 max-w-2xl" style="background: rgba(255, 255, 255, 0.8);">
+ <h3 data-template-id="online-fir-title" class="canva-text font-semibold mb-2" style="color: rgb(26, 32, 44); font-weight: 700; font-style: normal; font-size: 18px;">📝 File Online FIR</h3>
+ <p data-template-id="online-fir-desc" class="canva-text text-sm mb-4" style="color: rgb(74, 85, 104); font-weight: 400; font-style: normal; font-size: 15px;">Submit your FIR online without a case number. An Application ID will be generated for tracking.</p>
+ <form id="online-fir-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+ <div>
+ <label data-template-id="label-applicant-name" class="canva-text text-sm font-medium" for="applicant-name" style="color: rgb(45, 55, 72); font-weight: 400; font-style: normal; font-size: 15px;">Your Full Name</label><input id="applicant-name" type="text" required="" class="w-full border rounded-lg px-3 py-2 mt-1 text-sm">
+ </div>
+ <div>
+ <label data-template-id="label-applicant-mobile" class="canva-text text-sm font-medium" for="applicant-mobile" style="color: rgb(45, 55, 72); font-weight: 400; font-style: normal; font-size: 15px;">Your Mobile Number</label><input id="applicant-mobile" type="tel" required="" class="w-full border rounded-lg px-3 py-2 mt-1 text-sm" placeholder="10-digit number">
+ </div>
+ <div>
+ <label data-template-id="label-applicant-email" class="canva-text text-sm font-medium" for="applicant-email" style="color: rgb(45, 55, 72); font-weight: 400; font-style: normal; font-size: 15px;">Your Email Address</label><input id="applicant-email" type="email" class="w-full border rounded-lg px-3 py-2 mt-1 text-sm" placeholder="your@email.com">
+ </div>
+ <div>
+ <label data-template-id="label-applicant-gender" class="canva-text text-sm font-medium" for="applicant-gender" style="color: rgb(45, 55, 72); font-weight: 400; font-style: normal; font-size: 15px;">Gender</label><select id="applicant-gender" required="" class="w-full border rounded-lg px-3 py-2 mt-1 text-sm"><option value="">Select Gender</option><option value="Male">Male</option>
+<option value="Female">Female</option><option value="Other">Other</option></select>
+ </div>
+ <div>
+ <label data-template-id="label-online-district" class="canva-text text-sm font-medium" for="online-district" style="color: rgb(45, 55, 72); font-weight: 400; font-style: normal; font-size: 15px;">District (जिला)</label><select id="online-district" required="" class="w-full border rounded-lg px-3 py-2 mt-1 text-sm"><option value="">Select District</option></select>
+ </div>
+ <div>
+ <label data-template-id="label-online-thana" class="canva-text text-sm font-medium" for="online-thana" style="color: rgb(45, 55, 72); font-weight: 400; font-style: normal; font-size: 15px;">Police Station (थाना)</label><select id="online-thana" required="" class="w-full border rounded-lg px-3 py-2 mt-1 text-sm"><option value="">Select Thana</option></select>
+ </div>
+ <div>
+ <label data-template-id="label-incident-category" class="canva-text text-sm font-medium" for="incident-category" style="color: rgb(45, 55, 72); font-weight: 400; font-style: normal; font-size: 15px;">Crime Category</label><select id="incident-category" required="" class="w-full border rounded-lg px-3 py-2 mt-1 text-sm"><option value="">Select Category</option><option value="Murder">Murder</option><option value="Theft">Theft</option><option value="Cyber Crime">Cyber Crime</option><option value="Women Safety">Women Safety</option><option value="Kidnapping">Kidnapping</option><option value="Missing Person">Missing Person</option>
+<option value="Narcotics">Narcotics</option><option value="Financial Crime">Financial Crime</option><option value="Traffic">Traffic</option><option value="Other">Other</option>
+</select>
+ </div>
+ <div class="sm:col-span-2"> <label data-template-id="label-applicant-address" class="canva-text text-sm font-medium" for="applicant-address" style="color: rgb(45, 55, 72); font-weight: 400; font-style: normal; font-size: 15px;">Your Residential Address</label><textarea id="applicant-address" rows="2" class="w-full border rounded-lg px-3 py-2 mt-1 text-sm" placeholder="Full residential address..."></textarea>
+ </div>
+ <div class="sm:col-span-2">
+ <label data-template-id="label-incident-address" class="canva-text text-sm font-medium" for="incident-address" style="color: rgb(45, 55, 72); font-weight: 400; font-style: normal; font-size: 15px;">Incident Location &amp; Address</label><textarea id="incident-address" rows="2" class="w-full border rounded-lg px-3 py-2 mt-1 text-sm" placeholder="Incident location / address..."></textarea>
+ </div>
+ <div class="sm:col-span-2">
+ <label data-template-id="label-incident-desc" class="canva-text text-sm font-medium" for="incident-desc" style="color: rgb(45, 55, 72); font-weight: 400; font-style: normal; font-size: 15px;">Incident Description (विवरण)</label><textarea id="incident-desc" rows="3" required="" class="w-full border rounded-lg px-3 py-2 mt-1 text-sm" placeholder="Describe the incident in detail..."></textarea>
+ </div>
+ <div class="sm:col-span-2">
+ <label data-template-id="label-online-image" class="canva-text text-sm font-medium block mb-1" for="online-image" style="color: rgb(45, 55, 72); font-weight: 600; font-style: normal; font-size: 15px;">Application Image (आवेदन का चित्र)</label>
+ <div class="border-2 border-dashed rounded-lg p-4 text-center cursor-pointer hover:bg-blue-50 transition-colors" onclick="document.getElementById('online-image').click()" id="online-image-drop-zone">
+ <i data-lucide="upload" class="w-6 h-6 text-blue-600 mx-auto mb-2"></i>
+ <p class="text-sm text-gray-600 font-medium">Click to upload or drag image here</p>
+ <p class="text-xs text-gray-400 mt-1">Supported: PNG, JPG (Max 5MB)</p><input id="online-image" type="file" accept="image/*" class="hidden">
+ <div id="online-image-preview" class="hidden mt-3">
+ <img id="online-preview-img" class="max-h-32 mx-auto rounded-lg border">
+ <p id="online-preview-name" class="text-xs text-gray-500 mt-2"></p>
+ </div> </div>
+ <p id="online-image-error" class="text-red-600 text-xs mt-1 hidden"></p>
+ </div>
+ <div class="sm:col-span-2"><button data-template-id="online-fir-submit-btn" type="submit" class="canva-button px-6 py-2 rounded-lg font-medium" style="background: rgb(30, 58, 95); color: rgb(255, 255, 255); font-weight: 600; font-style: normal; font-size: 15px;">File Online FIR</button>
+<span id="online-fir-status" class="ml-3 text-sm hidden"></span>
+ </div>
+ </form>
+ <div id="online-fir-success" class="hidden mt-6 fade-in">
+ <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+ <p class="text-sm font-semibold text-green-700">✅ FIR Filed Successfully!</p>
+ <p id="generated-app-id" class="text-xl font-bold text-green-900 mt-2 font-mono"></p>
+ <p class="text-xs text-gray-600 mt-2">Please save this Application ID for future reference and case tracking.</p><button onclick="resetOnlineFIR()" class="mt-3 bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800">File Another FIR</button>
+ </div>
+ </div>
+ </div>
+ </div>
+ </section>
+ </main>
+ <div id="toast-container" class="fixed top-4 right-4 space-y-2 z-50"></div>
+ <div id="modal-container"></div>
+ <div id="limit-warning" class="hidden fixed bottom-4 right-4 bg-red-600 text-white px-4 py-3 rounded-lg shadow-lg text-sm max-w-xs">
+ ⚠️ Maximum 999 records reached.
+ </div>
+
+ <!-- ============================================================
+      CUSTOM BACKEND DATA-SDK SHIM
+      Canva's original /_sdk/*.js scripts (proprietary, only run
+      inside the Canva editor) have been replaced by this shim.
+      It implements the exact same window.dataSdk interface
+      (init / create / update / delete) that the app code below
+      expects, but talks to our own Express + SQLite REST API
+      instead of a Canva Sheet. NOTHING in the app logic below
+      this point has been changed.
+      ============================================================ -->
+ <script>
+ window.dataSdk = (function () {
+   const API_BASE = '/api/records';
+   let handler = null;
+   let pollTimer = null;
+   let lastSnapshot = '';
+
+   async function fetchAll() {
+     const res = await fetch(API_BASE);
+     const json = await res.json();
+     if (!json.isOk) throw new Error((json.error && json.error.message) || 'Failed to fetch records');
+     return json.data || [];
+   }
+
+   async function refreshAndNotify() {
+     const fresh = await fetchAll();
+     lastSnapshot = JSON.stringify(fresh);
+     if (handler) handler.onDataChanged(fresh);
+     return fresh;
+   }
+
+   return {
+     async init(h) {
+       handler = h;
+       try {
+         await refreshAndNotify();
+         pollTimer = setInterval(async () => {
+           try {
+             const fresh = await fetchAll();
+             const snap = JSON.stringify(fresh);
+             if (snap !== lastSnapshot) {
+               lastSnapshot = snap;
+               handler.onDataChanged(fresh);
+             }
+           } catch (e) { /* ignore transient poll errors */ }
+         }, 4000);
+         return { isOk: true };
+       } catch (e) {
+         return { isOk: false, error: { message: e.message } };
+       }
+     },
+     async create(record) {
+       try {
+         const res = await fetch(API_BASE, {
+           method: 'POST',
+           headers: { 'Content-Type': 'application/json' },
+           body: JSON.stringify(record)
+         });
+         const json = await res.json();
+         if (!json.isOk) return json;
+         await refreshAndNotify();
+         return { isOk: true, data: json.data };
+       } catch (e) {
+         return { isOk: false, error: { message: e.message } };
+       }
+     },
+     async update(record) {
+       try {
+         const id = record.__backendId;
+         const res = await fetch(API_BASE + '/' + id, {
+           method: 'PUT',
+           headers: { 'Content-Type': 'application/json' },
+           body: JSON.stringify(record)
+         });
+         const json = await res.json();
+         if (!json.isOk) return json;
+         await refreshAndNotify();
+         return { isOk: true, data: json.data };
+       } catch (e) {
+         return { isOk: false, error: { message: e.message } };
+       }
+     },
+     async delete(record) {
+       try {
+         const id = record.__backendId;
+         const res = await fetch(API_BASE + '/' + id, { method: 'DELETE' });
+         const json = await res.json();
+         if (!json.isOk) return json;
+         await refreshAndNotify();
+         return { isOk: true };
+       } catch (e) {
+         return { isOk: false, error: { message: e.message } };
+       }
+     }
+   };
+ })();
+ </script>
+
+ <script>
+ let allRecords = [];
+ let currentDistrictDash = null;
+ let loggedIOId = null;
+ let userValidMobile = null;
+ let sdkReady = false;
+ const STAGES = ['Pending','Under Investigation','Evidence Collection','Charge Sheet Ready','Court Trial','Closed','Disposed'];
+ const BIHAR_DISTRICTS = ['Patna','Gaya','Bhagalpur','Muzaffarpur','Purnia','Darbhanga','Bihar Sharif','Arrah','Begusarai','Chapra','Munger','Katihar','Saharsa','Sasaram','Hajipur','Dehri','Sitamarhi','Siwan','Motihari','Bettiah','Samastipur','Jehanabad','Nawada','Jamui','Lakhisarai','Sheikhpura','Nalanda','Aurangabad','Buxar','Bhojpur','Gopalganj','Madhubani','Supaul','Kishanganj','Araria','Madhepura','Khagaria','Banka'];
+ const THANA_BY_DISTRICT = {
+ 'Patna':['Patna City','Patna Sadar','Kankarbagh','Phulwari','Kumhrar','Danapur','Maner','Masaurhi'],
+ 'Gaya':['Gaya Town','Wazirganj','Manpur','Bodh Gaya','Atri','Sherpur'],
+ 'Bhagalpur':['Bhagalpur City','Nathnagar','Kahalgaon','Pirpainti','Naugachhia'],
+ 'Muzaffarpur':['Muzaffarpur City','Kanti','Alinagar','Minapur','Paroo','Sakra'],
+ 'Purnia':['Purnia City','Forbesganj','Bahadurganj','Kasba'],
+ 'Darbhanga':['Darbhanga City','Laheriasarai','Bahera','Jale'],
+ 'Bihar Sharif':['Bihar Sharif City','Pawapuri','Noorsarai','Asthawan'],
+ 'Arrah':['Arrah City','Jagdispur','Bikram','Dumraon'],
+ 'Begusarai':['Begusarai City','Barauni','Bachhwara','Teghra'],
+ 'Chapra':['Chapra City','Marhaura','Revelganj'],
+ 'Munger':['Munger City','Jamalpur'],
+ 'Katihar':['Katihar City','Manihari','Barari'], 'Saharsa':['Saharsa City','Simri','Maranga'],
+ 'Sasaram':['Sasaram City','Chenari','Tilauthu'],
+ 'Hajipur':['Hajipur City','Mahua','Lalganj'],
+ 'Dehri':['Dehri City','Rohtas'],
+ 'Sitamarhi':['Sitamarhi City','Ramnagar','Sursand'],
+ 'Siwan':['Siwan City','Rajapur','Mehsi'],
+ 'Motihari':['Motihari City','Raksaul','Sugauli'],
+ 'Bettiah':['Bettiah City','Narkatiaganj','Lauriya'],
+ 'Samastipur':['Samastipur City','Rosera','Dalsingsarai'],
+ 'Jehanabad':['Jehanabad City','Makhdumpur'],
+ 'Nawada':['Nawada City','Warisaliganj'],
+ 'Jamui':['Jamui City','Kharagpur'],
+ 'Lakhisarai':['Lakhisarai City','Halsi'],
+ 'Sheikhpura':['Sheikhpura City','Barbigha'],
+ 'Nalanda':['Rajgir','Biharsharif','Noorsarai'],
+ 'Aurangabad':['Aurangabad City','Daudnagar','Obra'],
+ 'Buxar':['Buxar City','Chausa','Dumraon'],
+ 'Bhojpur':['Arrah City','Jagdispur','Agiaon'],
+ 'Gopalganj':['Gopalganj City','Barauli'],
+ 'Madhubani':['Madhubani City','Jale','Laheriasarai'],
+ 'Supaul':['Supaul City','Maranga'],
+ 'Kishanganj':['Kishanganj City','Forbesganj'],
+ 'Araria':['Araria City','Forbesganj'],
+ 'Madhepura':['Madhepura City','Simri'],
+ 'Khagaria':['Khagaria City','Mansi'],
+ 'Banka':['Banka City','Amarpur']
+ }; const DIST_CREDS = {};
+ BIHAR_DISTRICTS.forEach((d, i) => { DIST_CREDS[d] = { id: 'DIST' + String(i+1).padStart(3,'0'), pw: 'bihar@' + String(i+1).padStart(3,'0') }; });
+ const HIGH_SECTIONS = ['302','376','395','307','364','396','397','304','306','363','366','370','375'];
+ const MEDIUM_SECTIONS = ['323','379','420','406','498','354','509','294','341','352','380','384','386'];
+ function getCases() { return allRecords.filter(r => r.record_type === 'case'); }
+ function getIOs() { return allRecords.filter(r => r.record_type === 'io'); }
+ function getUniqueIOs() {
+ const seen = new Set(); const result = [];
+ getIOs().forEach(io => { if (!seen.has(io.io_id)) { seen.add(io.io_id); result.push(io); } });
+ return result;
+ }
+ function getNotifications() { return allRecords.filter(r => r.record_type === 'notification'); }
+ function getMessages() { return allRecords.filter(r => r.record_type === 'message'); }
+ function getLeaveApplications() { return allRecords.filter(r => r.record_type === 'leave'); }
+ function detectPriorityFromSections(s) {
+ const nums = s.replace(/[^0-9,/\s]/g,' ').split(/[\s,/]+/).filter(Boolean);
+ if (nums.some(n => HIGH_SECTIONS.includes(n))) return 'High';
+ if (nums.some(n => MEDIUM_SECTIONS.includes(n))) return 'Medium';
+ return nums.length ? 'Low' : '';
+ }
+ function getLeastLoadedIO(district, thana) { let ios = getUniqueIOs().filter(i => i.district === district && i.io_status === 'Active');
+ if (thana) {
+ const thanaIOs = ios.filter(i => i.io_station === thana);
+ if (thanaIOs.length) ios = thanaIOs;
+ else if (ios.length === 0) return null;
+ }
+ if (!ios.length) return null;
+ const cases = getCases();
+ const loadMap = {};
+ ios.forEach(i => { loadMap[i.io_id] = 0; });
+ cases.forEach(c => { if (c.district === district && c.status !== 'Disposed' && c.status !== 'Closed' && loadMap[c.io_id] !== undefined) loadMap[c.io_id]++; });
+ let minId = ios[0].io_id, minLoad = Infinity;
+ Object.entries(loadMap).forEach(([id, count]) => { if (count < minLoad) { minLoad = count; minId = id; } });
+ return ios.find(i => i.io_id === minId);
+ }
+ function daysSince(d) { return d ? Math.floor((Date.now() - new Date(d).getTime()) / 86400000) : 0; }
+ function generateIOId() {
+ const ios = getIOs();
+ let maxNum = 0;
+ ios.forEach(io => { const m = (io.io_id||'').match(/BP(\d+)/); if (m) { const n = parseInt(m[1],10); if (n > maxNum) maxNum = n; } });
+ return 'BP' + String(maxNum + 1).padStart(8, '0');
+ }
+ function showToast(msg, type) { const container = document.getElementById('toast-container');
+ const t = document.createElement('div');
+ t.className = 'toast px-4 py-3 rounded-lg shadow-lg text-sm max-w-sm ' + (type === 'error' ? 'bg-red-600 text-white' : type === 'success' ? 'bg-green-600 text-white' : 'bg-blue-600 text-white');
+ t.textContent = msg;
+ container.appendChild(t);
+ setTimeout(() => { if (t.parentNode) t.remove(); }, 5000);
+ }
+ function safeISODate(val) {
+ if (!val || typeof val !== 'string' || val.trim() === '') return '';
+ try {
+ if (/^\d{4}-\d{2}-\d{2}$/.test(val.trim())) {
+ const [y,m,d] = val.trim().split('-').map(Number);
+ const dt = new Date(Date.UTC(y, m-1, d));
+ return isNaN(dt.getTime()) ? '' : dt.toISOString();
+ }
+ const dt = new Date(val);
+ return isNaN(dt.getTime()) ? '' : dt.toISOString();
+ } catch(e) { return ''; }
+ }
+ function buildRecord(overrides) {
+ const base = {
+ record_type:'',fir_number:'',thana:'',district:'',sections:'',incident_date:'',io_name:'',io_id:'',io_rank:'',io_mobile:'',io_email:'',io_belt_number:'',io_station:'',io_branch:'',io_status:'',io_joining_date:'',priority:'',status:'',current_stage:'',registered_date:'',deadline:'',category:'',delay_reason:'',daily_update:'',last_update_date:'',user_mobile:'',user_message:'',io_reply:'',additional_duty:'',duty_type:'',duty_location:'',duty_time:'',duty_status:'',duty_instructions:'',notification_text:'',notification_read:'',message_from:'',message_to:'',message_text:'',message_date:'',message_type:'',message_status:'',evidence_type:'',case_diary:'',leave_from_date:'',leave_to_date:'',leave_reason:'',leave_status:'',callback_location:'',callback_time:'',io_district:''
+ };
+ const record = Object.assign({}, base, overrides || {});
+ delete record.__backendId;
+ Object.keys(record).forEach(k => { if (record[k] === null || record[k] === undefined) record[k] = ''; else if (typeof record[k] !== 'string') record[k] = String(record[k]); });
+ return record;
+ }
+ function getMessageStatusIcon(msg) {
+ const s = msg.message_status || 'sent';
+ if (s === 'read') return '<span class="msg-status text-blue-600">✓✓ Read</span>';
+ if (s === 'delivered') return '<span class="msg-status text-green-600">✓✓ Delivered</span>';
+ return '<span class="msg-status text-gray-400">✓ Sent</span>';
+ }
+ function renderProgressBar(currentStage) {
+ const stageIdx = STAGES.indexOf(currentStage);
+ const progress = Math.round(((stageIdx + 1) / STAGES.length) * 100);
+ const progressPercent = (progress) + '%';
+ 
+ let html = '<div class="progress-bar-container">';
+ html += '<div class="progress-line" style="--progress-percent: ' + progressPercent + ';"></div>';
+ html += '<div class="progress-dots">';
+ 
+ STAGES.forEach((stage, i) => { const isCompleted = i < stageIdx;
+ const isActive = i === stageIdx;
+ const dotClass = isActive ? 'active' : isCompleted ? 'completed' : '';
+ html += '<div class="progress-dot ' + dotClass + '"></div>';
+ });
+ 
+ html += '</div>';
+ html += '<div class="progress-labels">';
+ 
+ const stageDisplayNames = [
+ 'Pending',
+ 'Under\nInvestigation',
+ 'Evidence\nCollection',
+ 'Charge Sheet\nReady',
+ 'Court\nTrial',
+ 'Closed',
+ 'Disposed'
+ ];
+ 
+ stageDisplayNames.forEach((displayName) => {
+ html += '<div class="progress-label">' + displayName.split('\n').map(line => '<span class="label-word">' + line + '</span>').join('') + '</div>';
+ });
+ 
+ html += '</div>';
+ html += '<div class="progress-percent">Progress: ' + progress + '%</div>';
+ html += '</div>';
+  return html;
+ }
+ function showModal(title, content) {
+ const container = document.getElementById('modal-container');
+ container.innerHTML = '<div class="modal-overlay" onclick="if(event.target===this)this.remove()"><div class="modal-content fade-in"><div class="flex items-center justify-between mb-4"><h2 class="text-lg font-bold text-blue-900">'+title+'</h2><button onclick="this.closest(\'.modal-overlay\').remove()" class="text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button></div><div>'+content+'</div></div></div>';
+ }
+ function populateDistrictDropdowns() {
+ const selects = [document.getElementById('district-sel'), document.getElementById('io-district'), document.getElementById('cred-district-sel')];
+ BIHAR_DISTRICTS.forEach(d => { selects.forEach(s => { if(s) s.appendChild(new Option(d, d)); }); });
+ const hqMsgTo = document.getElementById('hq-msg-to');
+ BIHAR_DISTRICTS.forEach(d => { hqMsgTo.appendChild(new Option('District: ' + d, 'district:'+d)); });
+ hqMsgTo.appendChild(new Option('All IOs (Broadcast)', 'all-ios'));
+ }
+ populateDistrictDropdowns();
+ document.getElementById('gen-cred-btn').addEventListener('click', function() {
+ const d = document.getElementById('cred-district-sel').value;
+ if (!d) { showToast('Select a district first', 'error'); return; }
+ if (!sdkReady) { showToast('Data not ready yet. Please wait...', 'error'); return; }
+ const cred = DIST_CREDS[d];
+ document.getElementById('cred-id-out').textContent = cred.id; document.getElementById('cred-pw-out').textContent = cred.pw;
+ document.getElementById('cred-output').classList.remove('hidden');
+ });
+ document.getElementById('toggle-creds').addEventListener('click', function() {
+ const wrap = document.getElementById('cred-table-wrap');
+ if (!wrap.classList.contains('hidden')) { wrap.classList.add('hidden'); this.textContent = 'Show All Credentials'; return; }
+ wrap.classList.remove('hidden'); this.textContent = 'Hide Credentials';
+ document.getElementById('cred-tbody').innerHTML = BIHAR_DISTRICTS.map(d => {
+ const c = DIST_CREDS[d]; const hasCases = getCases().some(cs => cs.district === d);
+ return '<tr class="border-t"><td class="p-2 font-medium">'+d+'</td><td class="p-2 font-mono text-blue-900">'+c.id+'</td><td class="p-2 font-mono text-green-700">'+c.pw+'</td><td class="p-2 text-center"><span class="text-xs px-2 py-0.5 rounded '+(hasCases?'bg-green-100 text-green-700':'bg-gray-100 text-gray-500')+'">'+(hasCases?'Active':'No Data')+'</span></td></tr>';
+ }).join('');
+ });
+ document.getElementById('district-sel').addEventListener('change', function() {
+ const thanaSelect = document.getElementById('thana');
+ thanaSelect.innerHTML = '<option value="">Select Thana</option>';
+ (THANA_BY_DISTRICT[this.value] || []).forEach(t => { thanaSelect.appendChild(new Option(t, t)); });
+ });
+ document.getElementById('io-district').addEventListener('change', function() {
+ const stationSel = document.getElementById('io-station');
+ stationSel.innerHTML = '<option value="">Select Station</option>';
+ (THANA_BY_DISTRICT[this.value] || []).forEach(t => { stationSel.appendChild(new Option(t, t)); }); });
+ function updatePriorityBadge() {}
+ // Image file handling
+ const appImageInput = document.getElementById('app-image');
+ const imageDropZone = document.getElementById('image-drop-zone');
+ const imagePreview = document.getElementById('image-preview');
+ const previewImg = document.getElementById('preview-img');
+ const previewName = document.getElementById('preview-name');
+ const imageError = document.getElementById('image-error');
+ function handleImageFile(file) {
+ if (!file) return;
+ if (!file.type.startsWith('image/')) { imageError.textContent = '⚠️ Please select an image file'; imageError.classList.remove('hidden'); return; }
+ if (file.size > 5 * 1024 * 1024) { imageError.textContent = '⚠️ File size must be less than 5MB'; imageError.classList.remove('hidden'); return; }
+ imageError.classList.add('hidden');
+ const reader = new FileReader();
+ reader.onload = function(e) { previewImg.src = e.target.result; previewName.textContent = '📄 ' + file.name; imagePreview.classList.remove('hidden'); };
+ reader.readAsDataURL(file);
+ }
+ appImageInput.addEventListener('change', function() { if (this.files && this.files[0]) handleImageFile(this.files[0]); });
+  imageDropZone.addEventListener('dragover', function(e) { e.preventDefault(); e.stopPropagation(); this.classList.add('bg-blue-50'); });
+ imageDropZone.addEventListener('dragleave', function(e) { e.preventDefault(); this.classList.remove('bg-blue-50'); });
+ imageDropZone.addEventListener('drop', function(e) { e.preventDefault(); e.stopPropagation(); this.classList.remove('bg-blue-50'); const files = e.dataTransfer.files; if (files.length > 0) { appImageInput.files = files; handleImageFile(files[0]); } });
+ // Tabs
+ document.querySelectorAll('.tab-btn').forEach(btn => {
+ btn.addEventListener('click', function() {
+ document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('tab-active'); b.classList.add('text-gray-500'); });
+ this.classList.add('tab-active'); this.classList.remove('text-gray-500');
+ document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
+ document.getElementById('tab-' + this.dataset.tab).classList.remove('hidden');
+ });
+ });
+ function switchToTab(tab) {
+ document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('tab-active'); b.classList.add('text-gray-500'); });
+ const btn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.dataset.tab === tab);
+ if (btn) { btn.classList.add('tab-active'); btn.classList.remove('text-gray-500'); }
+ document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
+ document.getElementById('tab-' + tab).classList.remove('hidden');
+ }
+ const handler = {
+ onDataChanged(data) { allRecords = data || [];
+ renderStateHQ();
+ renderCases();
+ renderDistrictGrid();
+ renderIOList();
+ if (currentDistrictDash) renderDistrictDashboard(currentDistrictDash);
+ if (loggedIOId) renderIOView();
+ if (userValidMobile) renderUserPortal();
+ }
+ };
+ (async function() {
+ const result = await window.dataSdk.init(handler);
+ if (!result.isOk) {
+ showToast('⚠️ Data connection failed: ' + (result.error?.message || 'Unknown error'), 'error');
+ return;
+ }
+ sdkReady = true;
+ showToast('✓ Data synced from server', 'success');
+ })();
+ function renderStateHQ() {
+ const cases = getCases();
+ const uniqueIOs = getUniqueIOs();
+ const pending = cases.filter(c => c.status !== 'Disposed' && c.status !== 'Closed');
+ const solved = cases.filter(c => c.status === 'Disposed' || c.status === 'Closed');
+ const stations = new Set(); Object.values(THANA_BY_DISTRICT).forEach(arr => arr.forEach(t => stations.add(t))); const activeIOs = uniqueIOs.filter(i => i.io_status === 'Active');
+ document.getElementById('hq-stat-stations').textContent = stations.size;
+ document.getElementById('hq-stat-ios').textContent = uniqueIOs.length;
+ document.getElementById('hq-stat-active').textContent = activeIOs.length;
+ document.getElementById('hq-stat-pending').textContent = pending.length;
+ document.getElementById('hq-stat-solved').textContent = solved.length;
+ document.getElementById('hq-stat-today').textContent = cases.length;
+ renderHQMessages();
+ // AI Insights
+ const insights = [];
+ const overdue = pending.filter(c => c.deadline && new Date(c.deadline) < new Date());
+ if (overdue.length > 0) insights.push({icon:'⏰', text: overdue.length + ' cases past deadline', color:'bg-orange-50 border-orange-200'});
+ if (cases.length > 0) { const rate = Math.round(solved.length/cases.length*100); insights.push({icon:'📈', text: 'Disposal rate: '+rate+'%', color:'bg-blue-50 border-blue-200'}); }
+ if (activeIOs.length > 0) { const avg = Math.round(pending.length/activeIOs.length); insights.push({icon:'✅', text: 'Avg '+avg+' cases per IO ('+activeIOs.length+' active)', color:'bg-green-50 border-green-200'}); }
+ if (!insights.length) insights.push({icon:'ℹ️', text:'No data yet. Register cases and IOs to begin.', color:'bg-gray-50 border-gray-200'});
+ document.getElementById('ai-insights').innerHTML = insights.map(i => '<div class="'+i.color+' border rounded-lg p-3"><p class="text-sm"><span class="mr-1">'+i.icon+'</span>'+i.text+'</p></div>').join('');
+ // District Performance
+ const distMap = {};
+ BIHAR_DISTRICTS.forEach(d => { distMap[d] = {total:0,pending:0,solved:0,ios:new Set()}; }); cases.forEach(c => { if (!distMap[c.district]) return; distMap[c.district].total++; if (c.status === 'Disposed' || c.status === 'Closed') distMap[c.district].solved++; else distMap[c.district].pending++; });
+ uniqueIOs.forEach(i => { if (distMap[i.district]) distMap[i.district].ios.add(i.io_id); });
+ const sorted = Object.entries(distMap).filter(([,v]) => v.total > 0).sort((a,b) => {
+ const rA = a[1].total ? a[1].solved/a[1].total : 0;
+ const rB = b[1].total ? b[1].solved/b[1].total : 0;
+ return rB - rA;
+ });
+ document.getElementById('hq-district-tbody').innerHTML = sorted.length ? sorted.map(([d,v], i) => {
+ const rate = v.total ? Math.round(v.solved/v.total*100) : 0;
+ return '<tr class="border-t hover:bg-blue-50/50"><td class="p-2 text-xs font-bold text-blue-900">#'+(i+1)+'</td><td class="p-2 text-sm font-medium cursor-pointer hover:underline" onclick="filterAndShowCases(\''+d+'\')">'+d+'</td><td class="p-2 text-center text-sm">'+v.ios.size+'</td><td class="p-2 text-center text-sm font-bold">'+v.total+'</td><td class="p-2 text-center"><span class="bg-orange-100 text-orange-700 px-2 py-0.5 rounded text-xs font-bold">'+v.pending+'</span></td><td class="p-2 text-center"><span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-bold">'+v.solved+'</span></td><td class="p-2 text-center text-sm font-bold '+(rate>60?'text-green-600':'text-orange-600')+'">'+rate+'%</td></tr>';
+ }).join('') : '<tr><td colspan="7" class="p-4 text-center text-gray-400 text-sm">No data yet.</td></tr>';
+ drawCharts(cases);
+ }
+ function filterAndShowCases(district, status) {
+ document.getElementById('search-input').value = district;
+ document.getElementById('filter-category').value = '';
+ document.getElementById('filter-status').value = status === 'pending' ? 'Pending' : status === 'solved' ? 'Disposed' : ''; switchToTab('cases');
+ renderCases();
+ }
+ function goToDistrict() { switchToTab('district'); }
+ function showAllIOs() {
+ const ios = getUniqueIOs();
+ if (!ios.length) { showToast('No IOs registered yet.', 'error'); return; }
+ showModal('All IOs ('+ios.length+')', '<div class="space-y-3 max-h-96 overflow-y-auto">'+ios.map(io => '<div class="border rounded-lg p-3"><p class="font-semibold text-sm text-blue-900">'+io.io_name+' <span class="font-mono text-xs bg-blue-200 text-blue-800 px-2 py-0.5 rounded">'+io.io_id+'</span></p><p class="text-xs text-gray-600">'+io.io_rank+' | '+io.district+' | '+io.io_station+'</p></div>').join('')+'</div>');
+ }
+ function showActiveIOs() {
+ const ios = getUniqueIOs().filter(i => i.io_status === 'Active');
+ if (!ios.length) { showToast('No active IOs.', 'error'); return; }
+ showModal('Active IOs ('+ios.length+')', '<div class="space-y-3 max-h-96 overflow-y-auto">'+ios.map(io => '<div class="border rounded-lg p-3"><p class="font-semibold text-sm text-blue-900">'+io.io_name+' <span class="font-mono text-xs bg-blue-200 text-blue-800 px-2 py-0.5 rounded">'+io.io_id+'</span></p><p class="text-xs text-gray-600">'+io.io_rank+' | '+io.district+' | '+io.io_station+'</p></div>').join('')+'</div>');
+ }
+ function showPendingCases() { document.getElementById('filter-status').value = 'Pending'; document.getElementById('filter-category').value = ''; document.getElementById('search-input').value = ''; switchToTab('cases'); renderCases(); }
+ function showSolvedCases() { document.getElementById('filter-status').value = 'Disposed'; document.getElementById('filter-category').value = ''; document.getElementById('search-input').value = ''; switchToTab('cases'); renderCases(); }
+ function showAllCases() { document.getElementById('filter-status').value = ''; document.getElementById('filter-category').value = ''; document.getElementById('search-input').value = ''; switchToTab('cases'); renderCases(); } function renderHQMessages() {
+ const msgs = getMessages().filter(m => m.message_from === 'state-hq' || m.message_to === 'state-hq');
+ const container = document.getElementById('hq-msg-list');
+ container.innerHTML = msgs.length ? msgs.slice(-10).map(m => {
+ const isSent = m.message_from === 'state-hq';
+ let label = isSent ? 'You → '+(m.message_to||'').replace('district:','District: ').replace('all-ios','All IOs') : 'From: '+(m.message_from||'').replace('district:','District: ');
+ return '<div class="msg-bubble '+(isSent?'msg-sent':'msg-received')+'"><p class="text-xs font-medium">'+label+'</p><p class="text-sm">'+m.message_text+'</p>'+(isSent?getMessageStatusIcon(m):'')+'</div>';
+ }).join('') : '<p class="text-xs text-gray-400 text-center">No messages yet.</p>';
+ }
+ document.getElementById('hq-msg-send').addEventListener('click', async function() {
+ const to = document.getElementById('hq-msg-to').value.trim();
+ const text = document.getElementById('hq-msg-text').value.trim();
+ if (!to || !text) { showToast('Select recipient and type message', 'error'); return; }
+ if (!sdkReady) { showToast('Data not ready. Please wait...', 'error'); return; }
+ if (allRecords.length >= 999) { document.getElementById('limit-warning').classList.remove('hidden'); return; }
+ this.disabled = true; this.style.opacity = '0.5';
+ const r = await window.dataSdk.create(buildRecord({ record_type:'message', message_from:'state-hq', message_to:to, message_text:text, message_date:new Date().toISOString(), message_type:'directive', message_status:'delivered' }));
+ this.disabled = false; this.style.opacity = '1';
+ if (r.isOk) {
+ showToast('✓ Message sent to server', 'success');
+ document.getElementById('hq-msg-text').value = '';
+ document.getElementById('hq-msg-to').value = ''; renderHQMessages();
+ } else {
+ showToast('✗ Failed to save message: ' + (r.error?.message || 'Unknown error'), 'error');
+ }
+ });
+ function renderDistrictGrid() {
+ const cases = getCases();
+ const uniqueIOs = getUniqueIOs();
+ const distMap = {};
+ BIHAR_DISTRICTS.forEach(d => { distMap[d] = {pending:0,solved:0,ios:0}; });
+ cases.forEach(c => { if (!distMap[c.district]) return; if (c.status === 'Disposed' || c.status === 'Closed') distMap[c.district].solved++; else distMap[c.district].pending++; });
+ uniqueIOs.forEach(i => { if (distMap[i.district]) distMap[i.district].ios++; });
+ document.getElementById('district-grid').innerHTML = BIHAR_DISTRICTS.map(d => {
+ const v = distMap[d];
+ return '<div class="district-card glass rounded-xl p-4 cursor-pointer border border-white/50" onclick="selectDistrict(\''+d+'\')"><div class="flex items-center gap-2 mb-2"><div class="w-8 h-8 rounded-full bg-yellow-400/80 flex items-center justify-center"><i data-lucide="shield" class="w-4 h-4 text-blue-900"></i></div><h4 class="font-semibold text-sm text-blue-900">'+d+'</h4></div><div class="grid grid-cols-3 gap-1 text-center"><div><p class="text-xs text-gray-500">Pending</p><p class="font-bold text-orange-600 text-sm">'+v.pending+'</p></div><div><p class="text-xs text-gray-500">Solved</p><p class="font-bold text-green-600 text-sm">'+v.solved+'</p></div><div><p class="text-xs text-gray-500">IOs</p><p class="font-bold text-blue-600 text-sm">'+v.ios+'</p></div></div></div>';
+ }).join('');
+ lucide.createIcons();
+ }
+ function selectDistrict(d) {
+ document.getElementById('district-select-view').classList.add('hidden'); document.getElementById('district-login-view').classList.remove('hidden');
+ document.getElementById('dist-login-name').textContent = d + ' District';
+ document.getElementById('dist-login-form').dataset.district = d;
+ lucide.createIcons();
+ }
+ function filterDDCases(type) {
+ if (!currentDistrictDash) return;
+ const cases = getCases().filter(c => c.district === currentDistrictDash);
+ let filtered = [];
+ if (type === 'pending') filtered = cases.filter(c => c.status !== 'Disposed' && c.status !== 'Closed');
+ else if (type === 'solved') filtered = cases.filter(c => c.status === 'Disposed' || c.status === 'Closed');
+ else if (type === 'high') filtered = cases.filter(c => c.priority === 'High' && c.status !== 'Disposed' && c.status !== 'Closed');
+ else if (type === 'active') {
+ const ios = getUniqueIOs().filter(i => i.district === currentDistrictDash && i.io_status === 'Active');
+ const content = ios.length ? ios.map(io => '<div class="border rounded-lg p-3"><p class="text-sm font-semibold">'+io.io_name+' <span class="text-xs font-mono bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">'+io.io_id+'</span></p><p class="text-xs text-gray-600">'+io.io_rank+' | '+io.io_station+'</p></div>').join('') : '<p class="text-sm text-gray-400">No active IOs in '+currentDistrictDash+'.</p>';
+ showModal('Active IOs in '+currentDistrictDash+' ('+ios.length+')', '<div class="space-y-3 max-h-96 overflow-y-auto">'+content+'</div>');
+ return;
+ }
+ if (filtered.length) showModal(type.charAt(0).toUpperCase()+type.slice(1)+' Cases in '+currentDistrictDash+' ('+filtered.length+')', '<div class="space-y-3 max-h-96 overflow-y-auto">'+filtered.map(c => '<div class="border rounded-lg p-3 cursor-pointer hover:shadow" onclick="showCaseDetail(\''+c.__backendId+'\')"><p class="text-sm font-semibold">FIR: '+c.fir_number+'</p><p class="text-xs text-gray-600">'+c.thana+' | '+c.current_stage+' | '+daysSince(c.registered_date)+' days</p></div>').join('')+'</div>'); else showToast('No '+type+' cases in '+currentDistrictDash, 'error');
+ }
+ document.getElementById('back-to-grid').addEventListener('click', function() {
+ document.getElementById('district-login-view').classList.add('hidden');
+ document.getElementById('district-select-view').classList.remove('hidden');
+ });
+ document.getElementById('dist-login-form').addEventListener('submit', function(e) {
+ e.preventDefault();
+ const d = this.dataset.district;
+ const id = document.getElementById('dist-login-id').value.trim().toUpperCase();
+ const pw = document.getElementById('dist-login-pw').value;
+ if (!sdkReady) {
+ const err = document.getElementById('dist-login-error');
+ err.textContent = '⚠️ System still loading. Please wait...';
+ err.classList.remove('hidden');
+ return;
+ }
+ const cred = DIST_CREDS[d];
+ if (id === cred.id.toUpperCase() && pw === cred.pw) {
+ document.getElementById('dist-login-error').classList.add('hidden');
+ document.getElementById('district-login-view').classList.add('hidden');
+ document.getElementById('district-dashboard-view').classList.remove('hidden');
+ currentDistrictDash = d;
+ renderDistrictDashboard(d);
+ } else { const err = document.getElementById('dist-login-error');
+ err.textContent = '❌ Invalid credentials. Hint: ID=' + cred.id + ', PW=' + cred.pw;
+ err.classList.remove('hidden');
+ }
+ });
+ document.getElementById('dist-dash-back').addEventListener('click', function() {
+ currentDistrictDash = null;
+ document.getElementById('district-dashboard-view').classList.add('hidden');
+ document.getElementById('district-select-view').classList.remove('hidden');
+ });
+ function renderDistrictDashboard(district) {
+ document.getElementById('dist-dash-name').textContent = district + ' — District Authority';
+ const cases = getCases().filter(c => c.district === district);
+ const ios = getUniqueIOs().filter(i => i.district === district);
+ const pending = cases.filter(c => c.district === district && c.status !== 'Disposed' && c.status !== 'Closed');
+ const solved = cases.filter(c => c.district === district && (c.status === 'Disposed' || c.status === 'Closed'));
+ const high = pending.filter(c => c.district === district && c.priority === 'High');
+ document.getElementById('dd-pending').textContent = pending.length;
+ document.getElementById('dd-solved').textContent = solved.length;
+ document.getElementById('dd-high').textContent = high.length;
+ document.getElementById('dd-ios').textContent = ios.filter(i => i.io_status === 'Active').length;
+ // IO list with case load const ioMap = {};
+ ios.forEach(io => { ioMap[io.io_id] = {io, pending:0, solved:0}; });
+ cases.forEach(c => { if (ioMap[c.io_id]) { if (c.status === 'Disposed' || c.status === 'Closed') ioMap[c.io_id].solved++; else ioMap[c.io_id].pending++; } });
+ document.getElementById('dd-io-list').innerHTML = Object.values(ioMap).length ? Object.values(ioMap).map(v => {
+ const total = v.pending + v.solved; const rate = total ? Math.round(v.solved/total*100) : 0;
+ return '<div class="bg-white/80 rounded-lg p-3 flex items-center justify-between border-l-4 '+ (v.pending>8?'border-l-red-500':v.pending>4?'border-l-orange-400':'border-l-green-400')+'"><div><p class="text-sm font-semibold">'+v.io.io_name+' <span class="text-xs font-mono bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">'+v.io.io_id+'</span></p><p class="text-xs text-gray-500">'+v.io.io_rank+' | '+v.io.io_station+' | Pending: '+v.pending+' | Rate: '+rate+'%</p></div><p class="text-lg font-bold '+(v.pending>8?'text-red-600':'text-green-600')+'">'+v.pending+'</p></div>';
+ }).join('') : '<p class="text-sm text-gray-400">No IOs in this district.</p>';
+ // Cases list
+ document.getElementById('dd-cases-list').innerHTML = cases.length ? cases.slice(0,15).map(c => {
+ const days = daysSince(c.registered_date);
+ return '<div class="flex items-center justify-between py-2 border-b text-xs cursor-pointer hover:bg-blue-50 rounded px-2" onclick="showCaseDetail(\''+c.__backendId+'\')"><div><span class="font-semibold">FIR: '+c.fir_number+'</span> | '+c.thana+' | IO: '+(c.io_name||'--')+' | '+days+'d</div><div class="flex items-center gap-2"><span class="px-2 py-0.5 rounded '+ (c.status==='Disposed'||c.status==='Closed'?'bg-green-100 text-green-700':'bg-orange-100 text-orange-700')+' font-bold">'+c.status+'</span><button onclick="event.stopPropagation();advanceStage(\''+c.__backendId+'\')" class="bg-green-50 text-green-700 px-2 py-0.5 rounded hover:bg-green-100">Next</button></div></div>';
+ }).join('') : '<p class="text-sm text-gray-400">No cases.</p>';
+ // Duty IO select
+ const dutyIoSel = document.getElementById('dd-duty-io');
+ dutyIoSel.innerHTML = '<option value="">Choose IO...</option>'; ios.forEach(io => dutyIoSel.appendChild(new Option(io.io_name + ' (' + io.io_id + ')', io.io_id)));
+ // Messaging recipients
+ const msgToSel = document.getElementById('dist-msg-to');
+ msgToSel.innerHTML = '<option value="">Send to...</option><option value="state-hq">State HQ</option>';
+ BIHAR_DISTRICTS.forEach(d => { if (d !== district) msgToSel.appendChild(new Option('District: ' + d, 'district:' + d)); });
+ ios.forEach(io => msgToSel.appendChild(new Option('IO: ' + io.io_name + ' (' + io.io_district + ')', 'io:' + io.io_id)));
+ // Messages
+ const msgs = getMessages().filter(m => m.message_from === 'district:'+district || m.message_to === 'district:'+district);
+ document.getElementById('dist-msg-list').innerHTML = msgs.length ? msgs.slice(-10).map(m => {
+ const isSent = m.message_from === 'district:'+district;
+ let label = isSent ? 'You → '+(m.message_to||'').replace('district:','District: ').replace('io:','IO: ') : 'From: '+(m.message_from||'').replace('district:','District: ').replace('io:','IO: ').replace('state-hq','State HQ');
+ return '<div class="msg-bubble '+(isSent?'msg-sent':'msg-received')+'"><p class="text-xs font-medium">'+label+'</p><p class="text-sm">'+m.message_text+'</p>'+(isSent?getMessageStatusIcon(m):'')+'</div>';
+ }).join('') : '<p class="text-xs text-gray-400 text-center">No messages yet.</p>';
+ // Leave applications
+ const leaves = getLeaveApplications().filter(l => {
+ const io = getUniqueIOs().find(i => i.io_id === l.io_id);
+ return io && io.district === district;
+ });
+ document.getElementById('dd-leave-applications').innerHTML = leaves.length ? leaves.map(l => {
+ const io = getUniqueIOs().find(i => i.io_id === l.io_id); const statusColor = l.leave_status === 'Approved' ? 'bg-green-100 text-green-700' : l.leave_status === 'Rejected' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700';
+ return '<div class="border rounded-lg p-3 bg-white"><div class="flex items-start justify-between mb-2"><div><p class="text-sm font-semibold">'+(io?io.io_name:'IO')+' <span class="text-xs font-mono text-gray-600">'+l.io_id+'</span></p><p class="text-xs text-gray-600">'+(l.leave_from_date?new Date(l.leave_from_date).toLocaleDateString('en-IN'):'')+' to '+(l.leave_to_date?new Date(l.leave_to_date).toLocaleDateString('en-IN'):'')+'</p><p class="text-xs text-gray-500 mt-1">Reason: '+l.leave_reason+'</p></div><span class="text-xs px-2 py-1 rounded '+statusColor+' font-semibold">'+l.leave_status+'</span></div>'+(l.leave_status === 'Pending' ? '<div class="flex gap-2 mt-2 border-t pt-2"><button onclick="approveLeave(\''+l.__backendId+'\')" class="flex-1 bg-green-600 text-white px-3 py-1.5 rounded text-xs font-medium hover:bg-green-700">Approve</button><button onclick="rejectLeave(\''+l.__backendId+'\')" class="flex-1 bg-red-600 text-white px-3 py-1.5 rounded text-xs font-medium hover:bg-red-700">Reject</button></div>' : '')+'</div>';
+ }).join('') : '<p class="text-xs text-gray-400">No leave applications.</p>';
+ lucide.createIcons();
+ }
+ function showCaseDetail(id) {
+ const c = allRecords.find(x => x.__backendId === id);
+ if (!c) return;
+ const days = daysSince(c.registered_date);
+ const content = '<div class="space-y-3"><div class="grid grid-cols-2 gap-3 text-sm">'+
+ '<div><p class="text-xs text-gray-500">FIR Number</p><p class="font-bold">'+c.fir_number+'</p></div>'+
+ '<div><p class="text-xs text-gray-500">Category</p><p class="font-medium">'+ (c.category||'Other')+'</p></div>'+
+ '<div><p class="text-xs text-gray-500">District</p><p class="font-medium">'+c.district+'</p></div>'+
+ '<div><p class="text-xs text-gray-500">Thana</p><p class="font-medium">'+c.thana+'</p></div>'+
+ '<div><p class="text-xs text-gray-500">Sections</p><p class="font-medium">'+c.sections+'</p></div>'+ '<div><p class="text-xs text-gray-500">Status / Stage</p><p class="font-medium">'+c.status+' / '+c.current_stage+'</p></div>'+
+ '<div><p class="text-xs text-gray-500">Days Elapsed</p><p class="font-medium">'+days+' days</p></div>'+
+ '<div><p class="text-xs text-gray-500">IO Assigned</p><p class="font-medium">'+ (c.io_name||'None')+' ('+(c.io_id||'--')+')</p></div>'+
+ '<div><p class="text-xs text-gray-500">IO Station</p><p class="font-medium">'+(c.io_station||'--')+'</p></div>'+
+ '<div><p class="text-xs text-gray-500">Incident Date</p><p class="font-medium">'+ (c.incident_date?new Date(c.incident_date).toLocaleDateString('en-IN'):'--')+'</p></div>'+
+ '<div><p class="text-xs text-gray-500">Deadline</p><p class="font-medium">'+(c.deadline?new Date(c.deadline).toLocaleDateString('en-IN'):'--')+'</p></div>'+
+ '<div><p class="text-xs text-gray-500">Complainant</p><p class="font-medium">'+ (c.user_mobile||'--')+'</p></div>'+
+ '<div><p class="text-xs text-gray-500">IO Progress</p><p class="font-medium">'+ (c.io_reply||'No updates')+'</p></div>'+
+ '</div><div class="mt-3"><p class="text-xs text-gray-500 mb-2">Case Progress</p>'+renderProgressBar(c.current_stage)+'</div></div>';
+ showModal('Case Detail — FIR: ' + c.fir_number, content);
+ }
+ document.getElementById('dist-msg-send').addEventListener('click', async function() {
+ const to = document.getElementById('dist-msg-to').value.trim();
+ const text = document.getElementById('dist-msg-text').value.trim();
+ if (!to || !text || !currentDistrictDash) { showToast('Select recipient and type message', 'error'); return; }
+ if (!sdkReady) { showToast('Data not ready. Please wait...', 'error'); return; }
+ if (allRecords.length >= 999) { document.getElementById('limit-warning').classList.remove('hidden'); return; }
+ this.disabled = true; this.style.opacity = '0.5';
+ const r = await window.dataSdk.create(buildRecord({ record_type:'message', message_from:'district:'+currentDistrictDash, message_to:to, message_text:text, message_date:new Date().toISOString(), message_type:'letter', message_status:'delivered' })); this.disabled = false; this.style.opacity = '1';
+ if (r.isOk) {
+ showToast('✓ Message sent to server', 'success');
+ document.getElementById('dist-msg-text').value = '';
+ renderDistrictDashboard(currentDistrictDash);
+ } else {
+ showToast('✗ Failed to save message: ' + (r.error?.message || 'Unknown error'), 'error');
+ }
+ });
+ document.getElementById('dd-assign-btn').addEventListener('click', async function() {
+ const ioId = document.getElementById('dd-duty-io').value;
+ const desc = document.getElementById('dd-duty-desc').value.trim();
+ const location = document.getElementById('dd-duty-location').value.trim();
+ const time = document.getElementById('dd-duty-time').value;
+ const dutyType = document.getElementById('dd-duty-type').value;
+ if (!ioId || !desc) { showDDStatus('Select IO and enter instructions', true); return; }
+ if (!sdkReady) { showDDStatus('Data not ready. Please wait...', true); return; }
+ if (allRecords.length >= 999) { document.getElementById('limit-warning').classList.remove('hidden'); return; }
+ this.disabled = true; this.style.opacity = '0.5';
+ const r = await window.dataSdk.create(buildRecord({
+ record_type:'notification', io_id:ioId, district:currentDistrictDash||'', io_district:currentDistrictDash||'',
+ notification_text:'🔔 New '+dutyType+' duty: '+desc+(location?' at '+location:'')+(time?' on '+new Date(time).toLocaleString('en-IN'):''),
+ notification_read:'false', registered_date:new Date().toISOString(),
+ additional_duty:desc, duty_type:dutyType, duty_location:location, duty_time:safeISODate(time), duty_status:'Assigned', duty_instructions:desc }));
+ this.disabled = false; this.style.opacity = '1';
+ if (r.isOk) {
+ showDDStatus('✓ Duty saved to server', false);
+ showToast('Duty assigned', 'success');
+ document.getElementById('dd-duty-desc').value = '';
+ document.getElementById('dd-duty-location').value = '';
+ document.getElementById('dd-duty-time').value = '';
+ renderDistrictDashboard(currentDistrictDash);
+ } else {
+ showDDStatus('✗ Failed: ' + (r.error?.message || 'Unknown error'), true);
+ }
+ });
+ function showDDStatus(msg, err) {
+ const el = document.getElementById('dd-duty-status');
+ el.textContent = msg; el.className = 'ml-3 text-sm ' + (err ? 'text-red-600' : 'text-green-600');
+ el.classList.remove('hidden'); setTimeout(() => el.classList.add('hidden'), 4000);
+ }
+ function renderCases() {
+ const cases = getCases();
+ const search = document.getElementById('search-input').value.toLowerCase();
+ const cF = document.getElementById('filter-category').value;
+ const sF = document.getElementById('filter-status').value;
+ let filtered = cases.filter(c => {
+ if (search && !(c.fir_number+' '+c.io_name+' '+c.thana+' '+c.district).toLowerCase().includes(search)) return false; if (cF && c.category !== cF) return false;
+ if (sF && c.status !== sF) return false;
+ return true;
+ });
+ const pendingAll = cases.filter(c => c.status !== 'Disposed' && c.status !== 'Closed').length;
+ document.getElementById('cases-summary').innerHTML = '<span>Total: <strong>'+cases.length+'</strong></span><span>Pending: <strong class="text-orange-600">'+pendingAll+'</strong></span><span>Solved: <strong class="text-green-600">'+(cases.length-pendingAll)+'</strong></span>';
+ const container = document.getElementById('cases-list');
+ const noEl = document.getElementById('no-cases');
+ if (!filtered.length) { container.innerHTML = ''; noEl.classList.remove('hidden'); return; }
+ noEl.classList.add('hidden');
+ container.innerHTML = filtered.slice(0,50).map(c => {
+ const days = daysSince(c.registered_date);
+ const urgency = days > 365 ? 'border-l-red-500' : days > 90 ? 'border-l-orange-400' : 'border-l-green-400';
+ return '<div class="bg-white rounded-lg shadow p-4 border-l-4 '+urgency+' cursor-pointer hover:shadow-md transition-shadow" onclick="showCaseDetail(\''+c.__backendId+'\')"><div class="flex flex-wrap items-start justify-between gap-2"><div class="flex-1 min-w-0"><p class="font-semibold text-sm">FIR: '+c.fir_number+' <span class="text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">'+(c.category||'Other')+'</span></p><p class="text-xs text-gray-500 mt-1">'+c.thana+', '+c.district+' | IO: '+(c.io_name||'--')+' ('+(c.io_id||'--')+')</p><p class="text-xs text-gray-400">§ '+c.sections+' | Stage: '+c.current_stage+' | '+days+' days</p></div><div class="flex gap-1 flex-wrap shrink-0" onclick="event.stopPropagation()"><button onclick="advanceStage(\''+c.__backendId+'\')" class="text-xs bg-green-50 text-green-700 px-2 py-1 rounded hover:bg-green-100">Next</button><button onclick="disposeCase(\''+c.__backendId+'\')" class="text-xs bg-orange-50 text-orange-700 px-2 py-1 rounded hover:bg-orange-100">Close</button><button onclick="confirmDelete(this,\''+c.__backendId+'\')" class="text-xs bg-red-50 text-red-700 px-2 py-1 rounded hover:bg-red-100">Delete</button></div></div><div class="mt-3 text-xs">'+renderProgressBar(c.current_stage)+'</div></div>';
+ }).join('');
+ } document.getElementById('case-form').addEventListener('submit', async function(e) {
+ e.preventDefault();
+ const btn = document.querySelector('[data-template-id="submit-btn"]');
+ btn.disabled = true; btn.style.opacity = '0.5';
+ const fir = document.getElementById('fir').value.trim();
+ const thana = document.getElementById('thana').value;
+ const district = document.getElementById('district-sel').value;
+ const sections = document.getElementById('sections').value.trim();
+ const incidentDate = document.getElementById('incident-date').value;
+ const category = document.getElementById('case-category').value;
+ const gender = document.getElementById('case-gender').value;
+ const stage = document.getElementById('stage').value;
+ const description = document.getElementById('case-description').value.trim();
+ const address = document.getElementById('case-address').value.trim();
+ const residentialAddress = document.getElementById('case-residential-address').value.trim();
+ const appImageInput = document.getElementById('app-image');
+ const imageError = document.getElementById('image-error');
+ imageError.classList.add('hidden');
+ 
+ if (!fir || !thana || !district || !sections || !incidentDate || !category || !stage) {
+ showFormStatus('❌ Fill all required fields', true);
+ btn.disabled = false; btn.style.opacity = '1';
+ return;
+ }
+ if (!description) { showFormStatus('❌ Description is required', true); btn.disabled = false; btn.style.opacity = '1'; return; }
+ if (!residentialAddress) { showFormStatus('❌ Residential address is required', true); btn.disabled = false; btn.style.opacity = '1'; return; } if (!appImageInput.files || !appImageInput.files[0]) {
+ imageError.textContent = '⚠️ Application image is required';
+ imageError.classList.remove('hidden');
+ showFormStatus('❌ Image is required', true);
+ btn.disabled = false; btn.style.opacity = '1';
+ return;
+ }
+ if (!sdkReady) { showFormStatus('❌ Data not ready. Please wait...', true); btn.disabled = false; btn.style.opacity = '1'; return; }
+ 
+ const file = appImageInput.files[0];
+ if (file.size > 5 * 1024 * 1024) {
+ imageError.textContent = '⚠️ File size must be less than 5MB';
+ imageError.classList.remove('hidden');
+ showFormStatus('❌ File too large', true);
+ btn.disabled = false; btn.style.opacity = '1';
+ return;
+ }
+ 
+ if (allRecords.length >= 999) { showFormStatus('❌ Max capacity reached', true); btn.disabled = false; btn.style.opacity = '1'; return; }
+ 
+ const reader = new FileReader();
+ reader.onload = async function(evt) {
+ const imageBase64 = evt.target.result;
+ const deadline = document.getElementById('deadline').value;
+ const userMobile = document.getElementById('user-mobile').value.trim();
+ const r = await window.dataSdk.create(buildRecord({ record_type:'case', fir_number:fir, thana:thana, district:district, sections:sections,
+ incident_date:safeISODate(incidentDate), priority:'', status:stage, current_stage:stage, category:category, applicant_gender:gender,
+ registered_date:new Date().toISOString(), deadline:safeISODate(deadline),
+ last_update_date:new Date().toISOString(), user_mobile:userMobile, description:description,
+ applicant_address:residentialAddress, incident_address:address, application_image:imageBase64
+ }));
+ btn.disabled = false; btn.style.opacity = '1';
+ if (r.isOk) {
+ showFormStatus('✓ FIR saved to server: '+fir, false);
+ showToast('Case registered with image', 'success');
+ e.target.reset();
+ document.getElementById('image-preview').classList.add('hidden');
+ updatePriorityBadge();
+ } else {
+ showFormStatus('✗ Error saving case: ' + (r.error?.message || 'Unknown error'), true);
+ }
+ };
+ reader.onerror = function() {
+ showFormStatus('❌ Error reading image', true);
+ btn.disabled = false; btn.style.opacity = '1';
+ };
+ reader.readAsDataURL(file);
+ });
+ function showFormStatus(msg, err) {
+ const el = document.getElementById('form-status'); el.textContent = msg; el.className = 'ml-3 text-sm ' + (err ? 'text-red-600' : 'text-green-600');
+ el.classList.remove('hidden'); setTimeout(() => el.classList.add('hidden'), 6000);
+ }
+ document.getElementById('io-reg-form').addEventListener('submit', async function(e) {
+ e.preventDefault();
+ const btn = document.querySelector('[data-template-id="io-reg-btn"]');
+ const name = document.getElementById('io-name').value.trim();
+ const rank = document.getElementById('io-rank').value;
+ const belt = document.getElementById('io-belt').value.trim();
+ const mobile = document.getElementById('io-mobile').value.trim();
+ const email = document.getElementById('io-email').value.trim();
+ const district = document.getElementById('io-district').value;
+ const station = document.getElementById('io-station').value;
+ const joining = document.getElementById('io-joining').value;
+ if (!name || !rank || !belt || !mobile || !district || !station || !joining) {
+ showIORegStatus('❌ Fill all required fields', true);
+ return;
+ }
+ if (!sdkReady) { showIORegStatus('❌ Data not ready. Please wait...', true); return; }
+ if (allRecords.length >= 999) { showIORegStatus('❌ Max capacity reached', true); return; }
+ btn.disabled = true; btn.style.opacity = '0.5';
+ const ioId = generateIOId();
+ const r = await window.dataSdk.create(buildRecord({
+ record_type:'io', io_id:ioId, io_name:name, io_rank:rank, io_belt_number:belt,
+ io_mobile:mobile, io_email:email, district:district, io_station:station,
+ io_status:'Active', io_joining_date:safeISODate(joining), registered_date:new Date().toISOString(), io_district:district }));
+ btn.disabled = false; btn.style.opacity = '1';
+ if (r.isOk) {
+ showIORegStatus('✓ IO saved to server. ID: ' + ioId, false);
+ showToast('IO registered: ' + ioId, 'success');
+ document.getElementById('io-id-card').classList.remove('hidden');
+ document.getElementById('card-io-id').textContent = ioId;
+ document.getElementById('card-io-name').textContent = name;
+ document.getElementById('card-io-rank').textContent = rank;
+ document.getElementById('card-io-mobile').textContent = mobile;
+ document.getElementById('card-io-district').textContent = district;
+ document.getElementById('card-io-station').textContent = station;
+ e.target.reset();
+ } else {
+ showIORegStatus('✗ Failed to register: ' + (r.error?.message || 'Unknown error'), true);
+ }
+ });
+ function showIORegStatus(msg, err) {
+ const el = document.getElementById('io-reg-status');
+ el.textContent = msg; el.className = 'ml-3 text-sm ' + (err ? 'text-red-600' : 'text-green-600');
+ el.classList.remove('hidden'); setTimeout(() => el.classList.add('hidden'), 6000);
+ }
+ function renderIOList() {
+ const ios = getUniqueIOs();
+ document.getElementById('io-list').innerHTML = ios.length ? ios.map(io => '<div class="bg-gray-50 rounded-lg p-3 flex items-center justify-between border-l-4 '+ (io.io_status==='Active'?'border-l-green-500':'border-l-red-400')+'"><div><p class="text-sm font-semibold">'+io.io_name+' <span class="text-xs font-mono bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">'+io.io_id+'</span> <span class="text-xs text-gray-500">'+io.io_rank+'</span></p><p class="text-xs text-gray-400">📍 '+io.district+' | '+io.io_station+' | Belt: '+io.io_belt_number+'</p></div><span class="text-xs px-2 py-1 rounded '+(io.io_status==='Active'?'bg-green-100 text-green-700':'bg-red-100 text-red-700')+'">'+io.io_status+'</span></div>'
+ ).join('') : '<p class="text-xs text-gray-400">No IOs registered yet.</p>';
+ }
+ // IO Portal
+ document.getElementById('io-login-btn').addEventListener('click', function() {
+ const id = document.getElementById('io-login-id').value.trim().toUpperCase();
+ const errEl = document.getElementById('io-login-error');
+ if (!sdkReady) {
+ errEl.textContent = '⚠️ System still loading. Please wait...';
+ errEl.classList.remove('hidden');
+ return;
+ }
+ const io = getUniqueIOs().find(i => i.io_id === id);
+ if (!io) {
+ errEl.textContent = '❌ Invalid IO ID. Please check and try again.';
+ errEl.classList.remove('hidden');
+ return;
+ }
+ errEl.classList.add('hidden');
+ loggedIOId = id;
+ renderIOView();
+ });
+ document.getElementById('io-logout-btn').addEventListener('click', function() { loggedIOId = null; document.getElementById('io-logged-view').classList.add('hidden');
+ document.getElementById('io-callback-status').classList.add('hidden');
+ });
+ document.getElementById('io-callback-btn').addEventListener('click', async function() {
+ if (!loggedIOId || !sdkReady) return;
+ const io = getUniqueIOs().find(i => i.io_id === loggedIOId);
+ if (!io) return;
+ this.disabled = true; this.textContent = '📞 Sending...';
+ let locationStr = 'Location not available';
+ try {
+ const pos = await new Promise((resolve, reject) => {
+ if (navigator.geolocation) navigator.geolocation.getCurrentPosition(resolve, reject, {timeout:5000});
+ else reject(new Error('No geolocation'));
+ });
+ locationStr = pos.coords.latitude.toFixed(4) + ', ' + pos.coords.longitude.toFixed(4);
+ } catch(e) { locationStr = 'GPS unavailable'; }
+ if (allRecords.length >= 999) { document.getElementById('limit-warning').classList.remove('hidden'); this.disabled = false; this.textContent = '📞 Call Back'; return; }
+ const r = await window.dataSdk.create(buildRecord({
+ record_type:'notification', io_id:loggedIOId, district:io.district, io_district:io.district,
+ notification_text:'📞 CALLBACK from '+io.io_name+' ('+io.io_id+') | Location: '+locationStr,
+ notification_read:'false', registered_date:new Date().toISOString(),
+ callback_location:locationStr, callback_time:new Date().toISOString()
+ }));
+ this.disabled = false; this.textContent = '📞 Call Back';
+ if (r.isOk) { document.getElementById('io-callback-status').innerHTML = '✓ Callback saved to server | Location: <strong>'+locationStr+'</strong>';
+ document.getElementById('io-callback-status').classList.remove('hidden');
+ showToast('Callback saved', 'success');
+ } else {
+ showToast('✗ Failed to save callback: ' + (r.error?.message || 'Unknown error'), 'error');
+ }
+ });
+ function renderIOView() {
+ const io = getUniqueIOs().find(i => i.io_id === loggedIOId);
+ if (!io) return;
+ document.getElementById('io-logged-view').classList.remove('hidden');
+ document.getElementById('io-info-name').textContent = io.io_name;
+ document.getElementById('io-info-meta').textContent = 'ID: '+io.io_id+' | '+io.io_rank+' | '+io.district+' | '+io.io_station;
+ const cases = getCases().filter(c => c.io_id === loggedIOId);
+ const pending = cases.filter(c => c.status !== 'Disposed' && c.status !== 'Closed');
+ const disposed = cases.filter(c => c.status === 'Disposed' || c.status === 'Closed');
+ const duties = getNotifications().filter(n => n.io_id === loggedIOId && n.duty_status === 'Assigned');
+ document.getElementById('io-stat-total').textContent = cases.length;
+ document.getElementById('io-stat-pending').textContent = pending.length;
+ document.getElementById('io-stat-disposed').textContent = disposed.length;
+ document.getElementById('io-stat-duties').textContent = duties.length;
+ const caseSel = document.getElementById('io-msg-case'); caseSel.innerHTML = '<option value="">Select Case/FIR...</option>';
+ cases.forEach(c => caseSel.appendChild(new Option('FIR: ' + c.fir_number, c.__backendId)));
+ // Notifications (all for this IO)
+ const notifs = getNotifications().filter(n => n.io_id === loggedIOId);
+ document.getElementById('io-notif-list').innerHTML = notifs.length ? notifs.slice(-5).reverse().map(n =>
+ '<div class="bg-yellow-50 border border-yellow-200 rounded-lg p-2 text-xs">'+n.notification_text+'<span class="text-gray-400 ml-2">'+(n.registered_date?new Date(n.registered_date).toLocaleDateString('en-IN'):'')+'</span></div>'
+ ).join('') : '<p class="text-xs text-gray-400">No notifications.</p>';
+ // Duties
+ document.getElementById('io-duty-list').innerHTML = duties.length ? duties.map(d =>
+ '<div class="bg-purple-50 border border-purple-200 rounded-lg p-3"><p class="text-sm font-medium">'+(d.duty_type||'Duty')+': '+d.additional_duty+'</p><p class="text-xs text-gray-600">'+ (d.duty_location?'📍 '+d.duty_location:'')+(d.duty_time?' | 🕐 '+new Date(d.duty_time).toLocaleString('en-IN'):'')+'</p></div>'
+ ).join('') : '<p class="text-xs text-gray-400">No duties assigned.</p>';
+ // Cases with progress input
+ document.getElementById('io-cases-list').innerHTML = pending.length ? pending.map(c => {
+ const days = daysSince(c.registered_date);
+ return '<div class="bg-white border rounded-lg p-3 mb-3 cursor-pointer hover:shadow" onclick="showCaseDetail(\''+c.__backendId+'\')"><div class="flex justify-between items-start mb-2"><div><p class="text-sm font-medium">FIR: '+c.fir_number+'</p><p class="text-xs text-gray-500">'+c.thana+' | '+c.current_stage+' | '+days+'d</p></div><div class="flex gap-1" onclick="event.stopPropagation()"><button onclick="advanceStage(\''+c.__backendId+'\')" class="text-xs bg-green-50 text-green-700 px-2 py-1 rounded">Next</button><button onclick="disposeCase(\''+c.__backendId+'\')" class="text-xs bg-orange-50 text-orange-700 px-2 py-1 rounded">Close</button></div></div><div class="mt-2 border-t pt-2"><div class="text-xs mb-2">'+renderProgressBar(c.current_stage)+'</div><label class="text-xs font-medium text-gray-600 block mb-1">📝 Work Progress</label><textarea id="io-response-'+c.__backendId+'" placeholder="Update progress..." rows="2" class="w-full border rounded-lg px-2 py-1 text-xs" onblur="saveIOResponse(\''+c.__backendId+'\', this.value)">'+(c.io_reply||'')+'</textarea></div></div>';
+ }).join('') : '<p class="text-xs text-gray-400">No pending cases.</p>';
+ // Leave history
+ const leaves = getLeaveApplications().filter(l => l.io_id === loggedIOId);
+ document.getElementById('io-leave-history').innerHTML = leaves.length ? leaves.map(l => {
+ const statusColor = l.leave_status === 'Approved' ? 'bg-green-100 text-green-700' : l.leave_status === 'Rejected' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700';
+ return '<div class="border rounded-lg p-3 bg-white"><div class="flex items-start justify-between"><div><p class="text-sm font-semibold">'+(l.leave_from_date?new Date(l.leave_from_date).toLocaleDateString('en-IN'):'')+' to '+(l.leave_to_date?new Date(l.leave_to_date).toLocaleDateString('en-IN'):'')+'</p><p class="text-xs text-gray-600">'+l.leave_reason+'</p></div><span class="text-xs px-2 py-1 rounded '+statusColor+'">'+l.leave_status+'</span></div></div>';
+ }).join('') : '<p class="text-xs text-gray-400">No leave applications yet.</p>';
+ // Messages
+ const msgs = getMessages().filter(m => m.message_from === 'io:'+loggedIOId || m.message_to === 'io:'+loggedIOId);
+ document.getElementById('io-msg-list').innerHTML = msgs.length ? msgs.slice(-10).map(m => {
+ const isSent = m.message_from === 'io:'+loggedIOId;
+ let label = '';
+ if (isSent) { const to=m.message_to||''; label='You → '+(to.startsWith('district:')?'District: '+to.replace('district:',''):to.startsWith('user:')?'User':to); }
+ else { const from=m.message_from||''; label='From: '+(from.startsWith('district:')?'District: '+from.replace('district:',''):from.startsWith('user:')?'User':from==='state-hq'?'State HQ':from); }
+ return '<div class="msg-bubble '+(isSent?'msg-sent':'msg-received')+'"><p class="text-xs font-medium">'+label+'</p><p class="text-sm">'+m.message_text+'</p>'+(isSent?getMessageStatusIcon(m):'')+'</div>';
+ }).join('') : '<p class="text-xs text-gray-400 text-center">No messages yet.</p>'; // Mark received as read (non-blocking, no infinite loop since we check status)
+ const unread = msgs.filter(m => m.message_to === 'io:'+loggedIOId && m.message_status !== 'read');
+ unread.forEach(m => { window.dataSdk.update(Object.assign({}, m, {message_status:'read'})); });
+ lucide.createIcons();
+ }
+ document.getElementById('io-msg-send').addEventListener('click', async function() {
+ if (!loggedIOId || !sdkReady) { showToast('IO not logged in or data not ready', 'error'); return; }
+ const caseId = document.getElementById('io-msg-case').value.trim();
+ const to = document.getElementById('io-msg-to').value.trim();
+ const text = document.getElementById('io-msg-text').value.trim();
+ if (!to || !text) { showToast('Select recipient and type message', 'error'); return; }
+ if (allRecords.length >= 999) { document.getElementById('limit-warning').classList.remove('hidden'); return; }
+ const io = getUniqueIOs().find(i => i.io_id === loggedIOId);
+ let messageTo = '';
+ if (to === 'district') messageTo = 'district:' + (io?io.district:'');
+ else if (to === 'user') {
+ if (caseId) { const cs = allRecords.find(x => x.__backendId === caseId); if (cs && cs.user_mobile) messageTo = 'user:'+cs.user_mobile; }
+ if (!messageTo) { showToast('Select a case with complainant mobile', 'error'); return; }
+ }
+ if (!messageTo) { showToast('Cannot determine recipient', 'error'); return; }
+ this.disabled = true; this.style.opacity = '0.5';
+ const r = await window.dataSdk.create(buildRecord({ record_type:'message', message_from:'io:'+loggedIOId, message_to:messageTo, message_text:text,
+ message_date:new Date().toISOString(), message_type:'letter', message_status:'delivered'
+ }));
+ this.disabled = false; this.style.opacity = '1';
+ if (r.isOk) {
+ showToast('✓ Message saved to server', 'success');
+ document.getElementById('io-msg-text').value = '';
+ renderIOView();
+ } else {
+ showToast('✗ Failed to save message: ' + (r.error?.message || 'Unknown error'), 'error');
+ }
+ });
+ document.getElementById('io-leave-submit').addEventListener('click', async function() {
+ if (!loggedIOId || !sdkReady) { showToast('IO not logged in or data not ready', 'error'); return; }
+ const fromDate = document.getElementById('io-leave-from').value;
+ const toDate = document.getElementById('io-leave-to').value;
+ const reason = document.getElementById('io-leave-reason').value.trim();
+ const statusEl = document.getElementById('io-leave-status');
+ if (!fromDate || !toDate || !reason) {
+ statusEl.textContent = '❌ Fill all fields';
+ statusEl.className = 'ml-3 text-sm text-red-600';
+ statusEl.classList.remove('hidden');
+ return;
+ }
+ if (allRecords.length >= 999) { document.getElementById('limit-warning').classList.remove('hidden'); return; } this.disabled = true; this.style.opacity = '0.5';
+ const io = getUniqueIOs().find(i => i.io_id === loggedIOId);
+ const r = await window.dataSdk.create(buildRecord({
+ record_type:'leave', io_id:loggedIOId, io_name:io?io.io_name:'',
+ leave_from_date:safeISODate(fromDate), leave_to_date:safeISODate(toDate), leave_reason:reason,
+ leave_status:'Pending', district:io?io.district:'', io_district:io?io.district:'',
+ registered_date:new Date().toISOString()
+ }));
+ this.disabled = false; this.style.opacity = '1';
+ if (r.isOk) {
+ statusEl.textContent = '✓ Leave application saved to server';
+ statusEl.className = 'ml-3 text-sm text-green-600';
+ statusEl.classList.remove('hidden');
+ document.getElementById('io-leave-from').value = '';
+ document.getElementById('io-leave-to').value = '';
+ document.getElementById('io-leave-reason').value = '';
+ showToast('Leave submitted', 'success');
+ } else {
+ statusEl.textContent = '✗ Failed: ' + (r.error?.message || 'Unknown error');
+ statusEl.className = 'ml-3 text-sm text-red-600';
+ statusEl.classList.remove('hidden');
+ }
+ });
+ document.getElementById('user-search-btn').addEventListener('click', function() {
+ const mobile = document.getElementById('user-search-mobile').value.trim();
+ const errEl = document.getElementById('user-mobile-error'); if (!mobile || !/^\d{10}$/.test(mobile)) {
+ errEl.textContent = '❌ Enter valid 10-digit mobile.';
+ errEl.classList.remove('hidden');
+ document.getElementById('user-msg-wrapper').classList.add('hidden');
+ userValidMobile = null;
+ return;
+ }
+ if (!sdkReady) {
+ errEl.textContent = '⚠️ System still loading. Please wait...';
+ errEl.classList.remove('hidden');
+ return;
+ }
+ errEl.classList.add('hidden');
+ userValidMobile = mobile;
+ renderUserPortal();
+ });
+ document.getElementById('user-search-case-btn').addEventListener('click', function() {
+ const caseNum = document.getElementById('user-search-case').value.trim();
+ const errEl = document.getElementById('user-mobile-error');
+ if (!caseNum) {
+ errEl.textContent = '❌ Enter FIR case number.';
+ errEl.classList.remove('hidden');
+ document.getElementById('user-msg-wrapper').classList.add('hidden');
+ userValidMobile = null;
+ return;
+ } if (!sdkReady) {
+ errEl.textContent = '⚠️ System still loading. Please wait...';
+ errEl.classList.remove('hidden');
+ return;
+ }
+ const caseRecord = getCases().find(c => c.fir_number && c.fir_number.toLowerCase() === caseNum.toLowerCase());
+ if (!caseRecord) {
+ errEl.textContent = '❌ No case found with this FIR number.';
+ errEl.classList.remove('hidden');
+ document.getElementById('user-msg-wrapper').classList.add('hidden');
+ userValidMobile = null;
+ return;
+ }
+ errEl.classList.add('hidden');
+ userValidMobile = caseRecord.user_mobile || 'case:'+caseNum;
+ renderUserPortal();
+ });
+ function renderUserPortal() {
+ if (!userValidMobile) return;
+ let results = [];
+ if (userValidMobile.startsWith('case:')) {
+ const caseNum = userValidMobile.substring(5);
+ results = getCases().filter(c => c.fir_number && c.fir_number.toLowerCase() === caseNum.toLowerCase());
+ } else {
+ results = getCases().filter(c => c.user_mobile === userValidMobile); }
+ // Deduplicate by FIR number, keeping only the latest (by registered_date)
+ const seen = {};
+ results.forEach(c => {
+ if (!seen[c.fir_number] || new Date(c.registered_date) > new Date(seen[c.fir_number].registered_date)) {
+ seen[c.fir_number] = c;
+ }
+ });
+ results = Object.values(seen);
+ const container = document.getElementById('user-cases-result');
+ const noEl = document.getElementById('user-no-result');
+ const msgWrapper = document.getElementById('user-msg-wrapper');
+ if (!results.length) { container.innerHTML = ''; noEl.classList.remove('hidden'); msgWrapper.classList.add('hidden'); return; }
+ noEl.classList.add('hidden'); msgWrapper.classList.remove('hidden');
+ container.innerHTML = results.map(c => {
+ const days = daysSince(c.registered_date);
+ return '<div class="border rounded-lg p-4 cursor-pointer hover:shadow" onclick="showCaseDetail(\''+c.__backendId+'\')"><p class="font-semibold text-sm">FIR: '+c.fir_number+' | '+(c.category||'Other')+'</p><p class="text-xs text-gray-500">'+c.thana+', '+c.district+' | IO: '+(c.io_name||'--')+'</p><p class="text-xs text-gray-400">Stage: '+c.current_stage+' | '+days+' days</p><div class="mt-2 text-xs">'+renderProgressBar(c.current_stage)+'</div></div>';
+ }).join('');
+ renderUserMessages();
+ }
+ function renderUserMessages() {
+ if (!userValidMobile) return; const msgs = getMessages().filter(m => m.message_from === 'user:'+userValidMobile || m.message_to === 'user:'+userValidMobile);
+ const container = document.getElementById('user-msg-list');
+ container.innerHTML = msgs.length ? msgs.slice(-10).map(m => {
+ const isSent = m.message_from === 'user:'+userValidMobile;
+ return '<div class="msg-bubble '+(isSent?'msg-sent':'msg-received')+'"><p class="text-xs font-medium">'+(isSent?'You → IO':'From: IO')+'</p><p class="text-sm">'+m.message_text+'</p>'+ (isSent?getMessageStatusIcon(m):'')+'</div>';
+ }).join('') : '<p class="text-xs text-gray-400 text-center">No messages yet.</p>';
+ // Mark received as read
+ const unread = msgs.filter(m => m.message_to === 'user:'+userValidMobile && m.message_status !== 'read');
+ unread.forEach(m => { window.dataSdk.update(Object.assign({}, m, {message_status:'read'})); });
+ }
+ document.getElementById('user-msg-send').addEventListener('click', async function() {
+ if (!userValidMobile || !sdkReady) { showToast('Track your case first or system not ready', 'error'); return; }
+ const text = document.getElementById('user-msg-text').value.trim();
+ if (!text) { showToast('Type a message', 'error'); return; }
+ if (allRecords.length >= 999) { document.getElementById('limit-warning').classList.remove('hidden'); return; }
+ const userCases = getCases().filter(c => c.user_mobile === userValidMobile);
+ let messageTo = userCases.length > 0 && userCases[0].io_id ? 'io:'+userCases[0].io_id : 'io-portal';
+ this.disabled = true; this.style.opacity = '0.5';
+ const r = await window.dataSdk.create(buildRecord({
+ record_type:'message', message_from:'user:'+userValidMobile, message_to:messageTo, message_text:text,
+ message_date:new Date().toISOString(), message_type:'incident_report', message_status:'delivered' }));
+ this.disabled = false; this.style.opacity = '1';
+ if (r.isOk) {
+ showToast('✓ Message saved to server', 'success');
+ document.getElementById('user-msg-text').value = '';
+ renderUserMessages();
+ } else {
+ showToast('✗ Failed to save message: ' + (r.error?.message || 'Unknown error'), 'error');
+ }
+ });
+ // User Portal Tab Switching
+ document.getElementById('user-portal-track-btn').addEventListener('click', function() {
+ this.classList.add('text-blue-700', 'border-b-2', 'border-blue-700');
+ this.classList.remove('text-gray-500', 'hover:text-gray-700');
+ document.getElementById('user-portal-online-fir-btn').classList.remove('text-blue-700', 'border-b-2', 'border-blue-700');
+ document.getElementById('user-portal-online-fir-btn').classList.add('text-gray-500', 'hover:text-gray-700');
+ document.getElementById('user-track-view').classList.remove('hidden');
+ document.getElementById('user-online-fir-view').classList.add('hidden');
+ });
+ document.getElementById('user-portal-online-fir-btn').addEventListener('click', function() {
+ this.classList.add('text-blue-700', 'border-b-2', 'border-blue-700');
+ this.classList.remove('text-gray-500', 'hover:text-gray-700');
+ document.getElementById('user-portal-track-btn').classList.remove('text-blue-700', 'border-b-2', 'border-blue-700'); document.getElementById('user-portal-track-btn').classList.add('text-gray-500', 'hover:text-gray-700');
+ document.getElementById('user-track-view').classList.add('hidden');
+ document.getElementById('user-online-fir-view').classList.remove('hidden');
+ });
+ // Online FIR Image handling
+ const onlineImageInput = document.getElementById('online-image');
+ const onlineImageDropZone = document.getElementById('online-image-drop-zone');
+ const onlineImagePreview = document.getElementById('online-image-preview');
+ const onlinePreviewImg = document.getElementById('online-preview-img');
+ const onlinePreviewName = document.getElementById('online-preview-name');
+ const onlineImageError = document.getElementById('online-image-error');
+ function handleOnlineImageFile(file) {
+ if (!file) return;
+ if (!file.type.startsWith('image/')) { onlineImageError.textContent = '⚠️ Please select an image file'; onlineImageError.classList.remove('hidden'); return; }
+ if (file.size > 5 * 1024 * 1024) { onlineImageError.textContent = '⚠️ File size must be less than 5MB'; onlineImageError.classList.remove('hidden'); return; }
+ onlineImageError.classList.add('hidden');
+ const reader = new FileReader();
+ reader.onload = function(e) { onlinePreviewImg.src = e.target.result; onlinePreviewName.textContent = '📄 ' + file.name; onlineImagePreview.classList.remove('hidden'); };
+ reader.readAsDataURL(file);
+ }
+ onlineImageInput.addEventListener('change', function() { if (this.files && this.files[0]) handleOnlineImageFile(this.files[0]); }); onlineImageDropZone.addEventListener('dragover', function(e) { e.preventDefault(); e.stopPropagation(); this.classList.add('bg-blue-50'); });
+ onlineImageDropZone.addEventListener('dragleave', function(e) { e.preventDefault(); this.classList.remove('bg-blue-50'); });
+ onlineImageDropZone.addEventListener('drop', function(e) { e.preventDefault(); e.stopPropagation(); this.classList.remove('bg-blue-50'); const files = e.dataTransfer.files; if (files.length > 0) { onlineImageInput.files = files; handleOnlineImageFile(files[0]); } });
+ function generateApplicationId() {
+ const timestamp = Date.now().toString(36).toUpperCase();
+ const random = Math.random().toString(36).substr(2, 8).toUpperCase();
+ return 'APP-' + timestamp + random;
+ }
+ function resetOnlineFIR() {
+ document.getElementById('online-fir-form').reset();
+ document.getElementById('online-image-preview').classList.add('hidden');
+ document.getElementById('online-fir-success').classList.add('hidden');
+ document.getElementById('online-fir-form').classList.remove('hidden');
+ }
+ document.getElementById('online-fir-form').addEventListener('submit', async function(e) {
+ e.preventDefault();
+ const btn = document.querySelector('[data-template-id="online-fir-submit-btn"]');
+ btn.disabled = true; btn.style.opacity = '0.5';
+ const applicantName = document.getElementById('applicant-name').value.trim();
+ const applicantMobile = document.getElementById('applicant-mobile').value.trim();
+ const applicantEmail = document.getElementById('applicant-email').value.trim(); const applicantGender = document.getElementById('applicant-gender').value;
+ const applicantAddress = document.getElementById('applicant-address').value.trim();
+ const incidentAddress = document.getElementById('incident-address').value.trim();
+ const district = document.getElementById('online-district').value;
+ const thana = document.getElementById('online-thana').value;
+ const category = document.getElementById('incident-category').value;
+ const description = document.getElementById('incident-desc').value.trim();
+ const onlineImageInput = document.getElementById('online-image');
+ const onlineImageError = document.getElementById('online-image-error');
+ onlineImageError.classList.add('hidden');
+ if (!applicantName || !applicantMobile || !applicantGender || !district || !thana || !category || !description) {
+ showOnlineFIRStatus('❌ Fill all required fields', true);
+ btn.disabled = false; btn.style.opacity = '1';
+ return;
+ }
+ if (!incidentAddress) {
+ showOnlineFIRStatus('❌ Incident address is required', true);
+ btn.disabled = false; btn.style.opacity = '1';
+ return;
+ }
+ if (!/^\d{10}$/.test(applicantMobile)) {
+ showOnlineFIRStatus('❌ Enter valid 10-digit mobile number', true);
+ btn.disabled = false; btn.style.opacity = '1'; return;
+ }
+ if (!sdkReady) {
+ showOnlineFIRStatus('❌ System not ready. Please wait...', true);
+ btn.disabled = false; btn.style.opacity = '1';
+ return;
+ }
+ if (!onlineImageInput.files || !onlineImageInput.files[0]) {
+ onlineImageError.textContent = '⚠️ Application image is required';
+ onlineImageError.classList.remove('hidden');
+ showOnlineFIRStatus('❌ Image is required', true);
+ btn.disabled = false; btn.style.opacity = '1';
+ return;
+ }
+ const file = onlineImageInput.files[0];
+ if (file.size > 5 * 1024 * 1024) {
+ onlineImageError.textContent = '⚠️ File size must be less than 5MB';
+ onlineImageError.classList.remove('hidden');
+ showOnlineFIRStatus('❌ File too large', true);
+ btn.disabled = false; btn.style.opacity = '1';
+ return;
+ }
+ if (allRecords.length >= 999) { showOnlineFIRStatus('❌ Max capacity reached', true);
+ btn.disabled = false; btn.style.opacity = '1';
+ return;
+ }
+ const reader = new FileReader();
+ reader.onload = async function(evt) {
+ const imageBase64 = evt.target.result;
+ const appId = generateApplicationId();
+ const r = await window.dataSdk.create(buildRecord({
+ record_type:'case',
+ fir_number:'',
+ application_id:appId,
+ applicant_name:applicantName,
+ user_mobile:applicantMobile,
+ applicant_email:applicantEmail,
+ applicant_gender:applicantGender,
+ applicant_address:applicantAddress,
+ incident_address:incidentAddress,
+ district:district,
+ thana:thana,
+ category:category,
+ description:description,
+ application_image:imageBase64,
+ status:'Pending',
+ current_stage:'Pending', registered_date:new Date().toISOString(),
+ last_update_date:new Date().toISOString()
+ }));
+ btn.disabled = false; btn.style.opacity = '1';
+ if (r.isOk) {
+ document.getElementById('online-fir-form').classList.add('hidden');
+ document.getElementById('generated-app-id').textContent = appId;
+ document.getElementById('online-fir-success').classList.remove('hidden');
+ showToast('✓ FIR saved to server. App ID: ' + appId, 'success');
+ } else {
+ showOnlineFIRStatus('✗ Error saving FIR: ' + (r.error?.message || 'Unknown error'), true);
+ }
+ };
+ reader.onerror = function() {
+ showOnlineFIRStatus('❌ Error reading image', true);
+ btn.disabled = false; btn.style.opacity = '1';
+ };
+ reader.readAsDataURL(file);
+ });
+ function showOnlineFIRStatus(msg, err) {
+ const el = document.getElementById('online-fir-status');
+ el.textContent = msg;
+ el.className = 'ml-3 text-sm ' + (err ? 'text-red-600' : 'text-green-600');
+ el.classList.remove('hidden'); setTimeout(() => el.classList.add('hidden'), 6000);
+ }
+ // Populate district dropdown for online FIR
+ const onlineDistrictSel = document.getElementById('online-district');
+ BIHAR_DISTRICTS.forEach(d => { onlineDistrictSel.appendChild(new Option(d, d)); });
+ document.getElementById('online-district').addEventListener('change', function() {
+ const thaSelect = document.getElementById('online-thana');
+ thaSelect.innerHTML = '<option value="">Select Thana</option>';
+ (THANA_BY_DISTRICT[this.value] || []).forEach(t => { thaSelect.appendChild(new Option(t, t)); });
+ });
+ // Actions
+ async function advanceStage(id) {
+ if (!sdkReady) { showToast('System not ready. Please wait...', 'error'); return; }
+ const c = allRecords.find(x => x.__backendId === id);
+ if (!c || c.record_type !== 'case') return;
+ const idx = STAGES.indexOf(c.current_stage);
+ if (idx < STAGES.length - 1) {
+ const newStage = STAGES[idx+1];
+ const updated = Object.assign({}, c, { current_stage:newStage, status: (newStage==='Disposed'||newStage==='Closed')?'Disposed':newStage, last_update_date:new Date().toISOString() });
+ const result = await window.dataSdk.update(updated);
+ if (result.isOk) { showToast('✓ Case stage updated: '+newStage, 'success'); }
+ else showToast('✗ Failed to update: ' + (result.error?.message || 'Unknown error'), 'error');
+ } }
+ async function disposeCase(id) {
+ if (!sdkReady) { showToast('System not ready. Please wait...', 'error'); return; }
+ const c = allRecords.find(x => x.__backendId === id);
+ if (!c || c.record_type !== 'case') return;
+ const updated = Object.assign({}, c, { status:'Disposed', current_stage:'Disposed', last_update_date:new Date().toISOString() });
+ const result = await window.dataSdk.update(updated);
+ if (result.isOk) { showToast('✓ Case disposed and saved to server', 'success'); }
+ else showToast('✗ Failed to dispose: ' + (result.error?.message || 'Unknown error'), 'error');
+ }
+ async function saveIOResponse(id, response) {
+ if (!sdkReady) return;
+ const c = allRecords.find(x => x.__backendId === id);
+ if (!c || c.record_type !== 'case' || !response.trim()) return;
+ const updated = Object.assign({}, c, { io_reply:response.trim(), last_update_date:new Date().toISOString() });
+ const result = await window.dataSdk.update(updated);
+ if (!result.isOk) showToast('✗ Failed to save progress: ' + (result.error?.message || 'Unknown error'), 'error');
+ }
+ let deleteTarget = null;
+ function confirmDelete(btn, id) {
+ if (!sdkReady) { showToast('System not ready. Please wait...', 'error'); return; }
+ if (deleteTarget === id) { deleteRecord(id); deleteTarget = null; } else { deleteTarget = id; btn.textContent = 'Confirm?'; btn.classList.add('bg-red-200');
+ setTimeout(() => { if (deleteTarget === id) { deleteTarget = null; btn.textContent = 'Delete'; btn.classList.remove('bg-red-200'); } }, 3000); }
+ }
+ async function deleteRecord(id) {
+ const c = allRecords.find(x => x.__backendId === id);
+ if (!c) return;
+ const result = await window.dataSdk.delete(c);
+ if (result.isOk) { showToast('✓ Record deleted from server', 'success'); }
+ else showToast('✗ Failed to delete: ' + (result.error?.message || 'Unknown error'), 'error');
+ }
+ async function approveLeave(id) {
+ if (!sdkReady) { showToast('System not ready. Please wait...', 'error'); return; }
+ const leave = allRecords.find(x => x.__backendId === id);
+ if (!leave) return;
+ const result = await window.dataSdk.update(Object.assign({}, leave, { leave_status:'Approved' }));
+ if (result.isOk) { showToast('✓ Leave approved and saved to server', 'success'); }
+ else showToast('✗ Failed to approve: ' + (result.error?.message || 'Unknown error'), 'error');
+ }
+ async function rejectLeave(id) {
+ if (!sdkReady) { showToast('System not ready. Please wait...', 'error'); return; }
+ const leave = allRecords.find(x => x.__backendId === id);
+ if (!leave) return;
+ const result = await window.dataSdk.update(Object.assign({}, leave, { leave_status:'Rejected' }));
+ if (result.isOk) { showToast('✓ Leave rejected and saved to server', 'success'); }
+ else showToast('✗ Failed to reject: ' + (result.error?.message || 'Unknown error'), 'error');
+ } function drawCharts(cases) {
+ const canvas1 = document.getElementById('chart-disposal-canvas');
+ const ctx1 = canvas1.getContext('2d');
+ const dpr = window.devicePixelRatio || 1;
+ canvas1.width = canvas1.offsetWidth * dpr; canvas1.height = 180 * dpr;
+ ctx1.scale(dpr, dpr); canvas1.style.height = '180px';
+ ctx1.clearRect(0, 0, canvas1.offsetWidth, 180);
+ const months = ['Jan','Feb','Mar','Apr','May','Jun'];
+ const disposed = months.map((_,i) => cases.filter(c => (c.status==='Disposed'||c.status==='Closed') && new Date(c.registered_date).getMonth()===i).length);
+ const registered = months.map((_,i) => cases.filter(c => new Date(c.registered_date).getMonth()===i).length);
+ const maxVal = Math.max(...disposed, ...registered, 1);
+ const cw = canvas1.offsetWidth; const w = cw / months.length;
+ months.forEach((m, i) => {
+ const h1 = (registered[i]/maxVal)*130; const h2 = (disposed[i]/maxVal)*130;
+ ctx1.fillStyle = '#bee3f8'; ctx1.fillRect(i*w+w*0.15, 155-h1, w*0.3, h1);
+ ctx1.fillStyle = '#1e3a5f'; ctx1.fillRect(i*w+w*0.5, 155-h2, w*0.3, h2);
+ ctx1.fillStyle = '#6b7280'; ctx1.font = '10px Work Sans'; ctx1.textAlign = 'center';
+ ctx1.fillText(m, i*w+w/2, 170);
+ });
+ const canvas2 = document.getElementById('chart-category-canvas');
+ const ctx2 = canvas2.getContext('2d');
+ canvas2.width = canvas2.offsetWidth * dpr; canvas2.height = 180 * dpr;
+ ctx2.scale(dpr, dpr); canvas2.style.height = '180px';
+ ctx2.clearRect(0, 0, canvas2.offsetWidth, 180); const cats = {}; cases.forEach(c => { const cat = c.category||'Other'; cats[cat]=(cats[cat]||0)+1; });
+ const catEntries = Object.entries(cats).sort((a,b) => b[1]-a[1]).slice(0,6);
+ const colors = ['#1e3a5f','#2c5282','#3182ce','#63b3ed','#e53e3e','#dd6b20'];
+ const total = catEntries.reduce((s,[,v]) => s+v, 0) || 1;
+ let startAngle = 0; const cx=90, cy=90, r=70;
+ catEntries.forEach(([cat,count],i) => {
+ const slice = (count/total)*Math.PI*2;
+ ctx2.beginPath(); ctx2.moveTo(cx,cy); ctx2.arc(cx,cy,r,startAngle,startAngle+slice);
+ ctx2.fillStyle = colors[i%colors.length]; ctx2.fill(); startAngle += slice;
+ });
+ catEntries.forEach(([cat,count],i) => {
+ ctx2.fillStyle = colors[i%colors.length]; ctx2.fillRect(190, 20+i*22, 12, 12);
+ ctx2.fillStyle = '#374151'; ctx2.font = '11px Work Sans'; ctx2.textAlign = 'left';
+ ctx2.fillText(cat+' ('+count+')', 208, 30+i*22);
+ });
+ }
+ document.getElementById('search-input').addEventListener('input', renderCases);
+ document.getElementById('filter-category').addEventListener('change', renderCases);
+ document.getElementById('filter-status').addEventListener('change', renderCases);
+ lucide.createIcons();
+ </script>
+</body></html>
